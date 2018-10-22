@@ -1,0 +1,16 @@
+###CLAMAV###
+https://wiki.debian.org/ClamAV
+Setup
+	# apt-get update
+	# apt-get install clamav
+	# apt-get install clamav-daemon
+
+Speedup clamav
+	It needs to be lauched as a daemon with "clamd"
+	
+Use (verbose, force multithreading)
+	# clamdscan -v -m <directory>
+	
+If error (lstat() failed: Permission denied. ERROR)
+https://stackoverflow.com/questions/25437940/configure-clamdscan-to-scan-all-files-on-a-system-on-unbuntu-12-04
+# clamdscan -v -m --fdpass <directory>	
