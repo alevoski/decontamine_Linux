@@ -1,0 +1,6 @@
+###USERS###
+You need to create a user "decontamine"
+
+###WRITING PERMISSIONS###
+You need to put the "home/decontamine" folder writing permissions to anyone.
+	# sudo chmod -R 757 /home/decontamine
