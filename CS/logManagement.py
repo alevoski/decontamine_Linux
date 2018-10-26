@@ -48,8 +48,8 @@ def writeFinalLog(concatenateBasesFiles, fileLst):
             # print ("testFile : "+str(i)) #ok
             shutil.copyfileobj(open(i, 'r', errors='ignore', encoding='utf-8'), finalFile)
             try:
-                # i.close() #surtout pas, engendre une erreur qui génère de très gros fichiers !!
-                os.remove(i) #suppression des fichiers concaténés
+                # i.close() #NEVER decomment : could create a very big file in an infinite loop
+                os.remove(i) #remove concatenated file
             except Exception:#OSError:
                 continue
     finalFile.close()

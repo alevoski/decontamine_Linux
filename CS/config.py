@@ -206,10 +206,10 @@ def configurator(avcompatibleDict):
     
 def activationQuestion(disabledToolsLST, etat, actif, affichage, elem):
     '''
-    Mode configuration - activer / désactiver des av
-    Prend en paramètre le dicos des av, l'état,
-    le contraire de l'état actuel 
-    Retourne la liste des av dont l'état doit être modifié
+    Configuration mode - enable/disable av and modules
+    Take av and modules list and things to be printed.
+    Ask question for each tools in the list.
+    Return av and modules list to be modified.
     ''' 
     avEtatAMod = []
     if len(disabledToolsLST) > 0:
@@ -231,11 +231,10 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem):
     
 def activationExec(lstAv, toMod, newStat, filepath, theName):
     '''
-    Réécriture du fichier .ini (activation/désactivation) en prenant en compte 
-    les modifications demandées.
-    Prend en paramètre la liste des av et à des modules à modifier, 
-    la valeur à inscrire dans le fichier .ini, le nouvel état de l'av
-    et le chemin du fichier où se situe le fichier .ini à réécrire
+    Rewrite .ini file (enable/disable) to take the changes into account
+    Take av list and modules to enable/disable, 
+    the value to write in the .ini file, it's printed value,
+    and the path of the .ini file
     '''
     if len(lstAv) > 0:#Si des av sont à activer ou à désactiver
         # print(lstAv)

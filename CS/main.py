@@ -37,7 +37,8 @@ def dismount(mountPTS):
 
 def init():
     '''
-    Initialisation of the cleaning station
+    Initialization of the cleaning station
+    It's the main function
     '''
     #Clean log directory
     stats.cleanLog(logDirectory)
