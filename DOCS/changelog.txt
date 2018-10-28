@@ -9,11 +9,12 @@ Option to stop the scan
 Force umount (CD/DVD)
 Full umount
 Better presentation of the printed sentences
-ClamAV : write in log the begining and the ending of the scan
 
 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ############################DID############################
+OK Bug correction in main which disabled the ability to copy the final log OK 28/10/2018
+OK ClamAV : write in log the begining and the ending of the scan OK 28/10/2018
 OK Option to dismount the device at the end of the scan OK 04/10/2018
 OK Option to read the final log OK 04/10/2018
 OK Option to copy the final log on the device (if not read only) 04/10/2018
