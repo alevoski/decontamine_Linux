@@ -1,5 +1,9 @@
 **Decontamine_Linux**
 USB devices cleaning station for Linux
 Started since September 2018
+Coding and testing on Debian 9 64 bits with Python 3
 Project ongoing
 Please see DOCS/ directory before using.
+
+HOW TO USE ?
+python3 main.py
