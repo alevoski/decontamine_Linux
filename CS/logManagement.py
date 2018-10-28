@@ -81,8 +81,10 @@ def getLog(finalLog, mountPTS):
     '''
     rep = commontools.prompter('Do you want a copy of the detail of the scan ? (y/n)')
     if 'y' in str(rep):
-        shutil.copy(finalLog, mountPTS)
         copiedFile = mountPTS + '/' + os.path.basename(finalLog)
+        # print(finalLog)
+        # print(copiedFile)
+        shutil.copy2(finalLog, copiedFile)
         # print(copiedFile)
         if os.path.isfile(copiedFile):
             print('The result of the scan have been copied on the device ' + mountPTS)

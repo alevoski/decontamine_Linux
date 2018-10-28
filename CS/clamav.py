@@ -4,6 +4,7 @@
 #@Alexandre Buissé - 2018
 
 import commontools
+import logManagement
 import subprocess
 import re
 
@@ -11,10 +12,10 @@ def init(mountPts, readOnly, logDirectory):
     '''
     Init scan with ClamAV
     '''
-    # print('Scan with ClamAV - begin')
     logFile = logDirectory + 'tempClamAV'
+    logManagement.writeLog(logFile, '\n*****Scan with ClamAV - begin*****\n', 'utf-8')
     res = scan(mountPts, readOnly, logFile)
-    # print('Scan with ClamAV - finish')
+    logManagement.writeLog(logFile, '\n*****Scan with ClamAV - finish*****\n', 'utf-8')
     if res == 1:
         virusDict = getVirus(logFile)
         # print(virusDict)

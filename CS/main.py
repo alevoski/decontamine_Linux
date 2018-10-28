@@ -105,8 +105,8 @@ def init():
         
         if mountpoint != '':
             
-            logFilePath1 = logDirectory + '/LOGS/' + str(datetime.now().strftime('%Y/%m/%d')) + '/' + datetime.now().strftime("%d%m%y%H%M%S")
-            logFilePath = logFilePath1+"Log.txt "
+            logFilePath1 = logDirectory + 'LOGS/' + str(datetime.now().strftime('%Y/%m/%d')) + '/' + datetime.now().strftime("%d%m%y%H%M%S")
+            logFilePath = logFilePath1+"Log.txt"
         
             print('Device ' + label + ' detected')
             if readonly == 1:
