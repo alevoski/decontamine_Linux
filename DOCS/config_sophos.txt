@@ -1,0 +1,22 @@
+https://www.sophos.com/en-us/medialibrary/PDFs/documentation/savl_9_sgeng.pdf
+   
+Download and install Sophos Anti-Virus for Linux (free version)
+    Download
+        Go to https://www.sophos.com/en-us/products/free-tools/sophos-antivirus-for-linux.aspx
+        Click on "get started"
+        Submit a name and an email and others informations asked
+        Download the tgz file (~514 MO for sav-linux-free-9)
+    Install Sophos without live protection
+        tar -xzvf sav-linux-free-9.tgz
+        sudo ./sophos-av/install.sh --live-protection=false
+        During the install, when prompt
+            Default directory install
+            Do not enable on-access scanning
+            Yes to auto-update from sophos
+            install free version of SAV for Linux
+
+Note : It will probably runs the same with a paid version of Sophos
+    
+Command to run on-demand scan
+    savscan -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime /deviceX
+    

@@ -2,15 +2,50 @@ CHANGELOG
 '''
 ############################TO DO############################
 
+Bonus
+    Web server stats
+        virus stats
+            total virus detected 
+            total virus deleted
+            5 last virus detected, when and where
+            total number of devices analyzed (and number for read only ones)
+        stations stats
+            name
+            last seen => last stats sent
+            where
+            os version with last updates dates
+            av and modules list installed with last updates dates
+            total devices scanned (and number for read only ones)
+            total virus detected (and deleted)
+            5 last virus detected and when
+            buttons to force updates
+            buttons to force station to send stats
+            
+    Send result to web server
+    Send stats to web server
+
+Top priorities
+    Analyze with Kaspersky (https://support.kaspersky.com/kes10linux#downloads) 
+    Analyze with ope module
+    Option to stop the scan
+        Considerate the stop in the final log
+    Force umount (CD/DVD)
+    Full umount
+    Better presentation of the printed sentences
+    Resolve crash bug after reseting the configuration
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+############################ONGOING############################
 Analyze with Sophos
-Analyze with ope module
-Option to stop the scan
-	Considerate the stop in the final log
-Force umount (CD/DVD)
-Full umount
-Better presentation of the printed sentences
-
-
+    TO DO/ONGOING
+        Scanning infected device
+        Remove not usefull information in log
+        Write header
+        
+    DO
+        Scanning
+        Version information
+    
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ############################DID############################
 OK Bug correction in main which disabled the ability to copy the final log OK 28/10/2018
