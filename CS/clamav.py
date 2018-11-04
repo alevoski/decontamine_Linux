@@ -44,10 +44,10 @@ def getVirus(logFile):
             lstRemoved.append(removedVirus[0])
             
     #Compare lstRemoved with virusTEMP:
-    removed = 0
     # print(lstRemoved)
     for k, v in virusTEMP.items():
         # print(k)
+        removed = 0
         if k in lstRemoved:
             removed = 1
             # print('rm ok')

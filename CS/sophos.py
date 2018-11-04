@@ -16,7 +16,11 @@ def init(mountPts, readOnly, logDirectory):
     logManagement.writeLog(logFile, '\n*****Scan with Sophos - begin*****\n', 'utf-8')
     res = scan(mountPts, readOnly, logFile)
     logManagement.writeLog(logFile, '\n*****Scan with Sophos - finish*****\n', 'utf-8')
-    if res == 1:
+    
+    # Clean the log of not usefull informations
+    logManagement.deleter(logFile, 'Using IDE file')
+    
+    if res == 3:
         virusDict = getVirus(logFile)
         # print(virusDict)
         return virusDict, logFile
@@ -33,21 +37,25 @@ def getVirus(logFile):
     virusType = ''
     lstRemoved = []
     for line in f:
-        if 'FOUND' in line:
-            virusName = re.findall('(.*):', str(line))
-            virusType = re.findall(':(.*)FOUND', str(line))
+        if '>>> Virus' in line:
+            virusName = re.findall('file (.*)', str(line))
+            virusType = re.findall("'(.*)'", str(line))
+            # print(virusName, virusType)
             virusTEMP[virusName[0]] = virusType[0]
-        if 'Removed' in line:
+        if 'Removal successful' in line:
             # print('rm : ', line)
-            removedVirus = re.findall('(.*):', str(line))
+            # removedVirus = re.findall('file (.*)', str(line))
             # print(removedVirus)
-            lstRemoved.append(removedVirus[0])
+            lstRemoved.append(virusName[0])
             
     #Compare lstRemoved with virusTEMP:
-    removed = 0
+    # print('Sophos - virus detected\n')
+    # print(virusTEMP)
+    # print('Sophos - virus removed\n')
     # print(lstRemoved)
     for k, v in virusTEMP.items():
         # print(k)
+        removed = 0
         if k in lstRemoved:
             removed = 1
             # print('rm ok')
@@ -59,19 +67,14 @@ def scan(mountPts, readOnly, logFile):
     Scan the mounting point in parameters.
     Return 
         a code
-            0 : No virus
-            1 : Virus found
-            2 : Error
-            3 : Scan stopped by user
+            0 : No virus and no errors
+            1 : Scan interruption
+            2 : Errors encounter
+            3 : Virus found
     '''
-    cmdline = 'savscan -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' > ' + logFile
-    # if readOnly == False:
-        # Ask user if he wants av to autoclean the device
-        # rep = commontools.prompter('Do you want to automaticly clean the device ? (y/n)')
-        # if 'y' in str(rep):
-            # cmdline = 'clamdscan -v -m --remove --fdpass -l ' + logFile + ' ' + mountPts
-        # elif 'n' in str(rep):
-            # pass
+    cmdline = 'savscan -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
+    if readOnly == False:
+        cmdline = 'savscan -remove -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
     print('Scan with Sophos - begin')
     try:
         res = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
@@ -79,6 +82,7 @@ def scan(mountPts, readOnly, logFile):
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
     except subprocess.CalledProcessError as e:#Error
+        # print(e)
         p = re.findall('exit status.*?(\d+)', str(e))
         # print(p)
         # print(int(p[0]))

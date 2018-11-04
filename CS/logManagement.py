@@ -9,6 +9,7 @@ import os
 import shutil
 import getch
 import subprocess
+import fileinput
 
 def extractSTR(line, mystrRGX):
     '''Extract str'''
@@ -91,4 +92,20 @@ def getLog(finalLog, mountPTS):
     elif 'n' in str(rep):
         pass 
     
+def replacer(logfile, elemOri, elem):
+    '''Replace elemOri with elem in logfile'''
+    f = open(logfile, 'r')
+    filedata = f.read()
+    f.close()
+
+    newdata = filedata.replace(elemOri, elem)
+
+    f = open(logfile, 'w')
+    f.write(newdata)
+    f.close()
     
+def deleter(logfile, elem):
+    '''Delete line containing elem in logfile'''
+    for line in fileinput.input(logfile, inplace=True):
+        if not re.search(elem, line):
+            print(line, end='')

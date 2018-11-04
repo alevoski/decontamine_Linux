@@ -33,21 +33,27 @@ Top priorities
     Full umount
     Better presentation of the printed sentences
     Resolve crash bug after reseting the configuration
-
+    Put av modules in a separate folder
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ############################ONGOING############################
 Analyze with Sophos
     TO DO/ONGOING
-        Scanning infected device
-        Remove not usefull information in log
-        Write header
-        
-    DO
-        Scanning
-        Version information
-    
+        Quickly get version information (~10 sec now)
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ############################DID############################
+OK Analyze with Sophos OK
+        Get virus in log (04/11/2018)
+            Virus name
+            Virus type
+            Removed or not
+        Support read only device = scan only (04/11/18)
+        Remove not usefull information in log (04/11/18)
+        Write header (append mode used ' >> output' instead of ' > output') (04/11/18)
+        Version information (01/11/18)
+OK AV integrations OK (04/11/2018) - tested with ClamAV and Sophos
+    Compare av dict to avoid double counts 
+        result() function in analyze module modded.
+        final() function in analyze module modded.
 OK Bug correction in main which disabled the ability to copy the final log OK 28/10/2018
 OK ClamAV : write in log the begining and the ending of the scan OK 28/10/2018
 OK Option to dismount the device at the end of the scan OK 04/10/2018
