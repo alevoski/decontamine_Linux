@@ -26,13 +26,12 @@ Bonus
 
 Top priorities
     Analyze with Kaspersky (https://support.kaspersky.com/kes10linux#downloads) 
-    Analyze with ope module
+    Analyze with ope (office, pdf and exe) module
     Option to stop the scan
         Considerate the stop in the final log
     Force umount (CD/DVD)
     Full umount
     Better presentation of the printed sentences
-    Resolve crash bug after reseting the configuration
     Put av modules in a separate folder
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ############################ONGOING############################
@@ -41,33 +40,54 @@ Analyze with Sophos
         Quickly get version information (~10 sec now)
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ############################DID############################
-OK Analyze with Sophos OK
-        Get virus in log (04/11/2018)
+11/11/2018
+    No more crash after reseting the configuration
+        Correction of a bug in function setConfInfos() in config module, it appended name instead of tool. 
+    activationQuestion() in config module now directy sed the cfg file so activationExec() removed because no longer in use
+    Sophos version now display the most recent update (version() function of sophos module modded)
+    
+04/11/18
+    Analyze with Sophos 
+        Get virus in log
             Virus name
             Virus type
             Removed or not
-        Support read only device = scan only (04/11/18)
-        Remove not usefull information in log (04/11/18)
-        Write header (append mode used ' >> output' instead of ' > output') (04/11/18)
-        Version information (01/11/18)
-OK AV integrations OK (04/11/2018) - tested with ClamAV and Sophos
+        Support read only device = scan only
+        Remove not usefull information in log
+        Write header (append mode used ' >> output' instead of ' > output')
+    AV integrations
+            
+01/11/18        
+    Version information - tested with ClamAV and Sophos
     Compare av dict to avoid double counts 
         result() function in analyze module modded.
         final() function in analyze module modded.
-OK Bug correction in main which disabled the ability to copy the final log OK 28/10/2018
-OK ClamAV : write in log the begining and the ending of the scan OK 28/10/2018
-OK Option to dismount the device at the end of the scan OK 04/10/2018
-OK Option to read the final log OK 04/10/2018
-OK Option to copy the final log on the device (if not read only) 04/10/2018
-OK Scan stat (device scan, virus detected, virus removed) and log cleaner OK 03/10/2018
-OK Get one final log per device scanned OK 03/10/2018
-OK Analyze with ClamAV OK	03/10/2018
-OK Manage read only devices 29/09/2018
-OK Configuration mode to chose scanners and auto configure the station OK 21/09/2018
-OK Go with Python 3.5 to get maximum performance out of os.walk() OK
-OK When a drive is detected, wait the drive to be ready to scan its devices 04/09/2018
-OK When a device is chosen (manually or not), wait the device to be ready to scan its files (now = no files to analyze) 
-    OK virtualCD                            04/09/2018
-    OK USB Thumb                            04/09/2018    
-    OK Hard drive with multiple partition   04/09/2018
-'''
+   
+28/10/2018
+    Bug correction in main which disabled the ability to copy the final log
+    ClamAV : write in log the begining and the ending of the scan
+    
+
+04/10/2018
+    Option to dismount the device at the end of the scan
+    Option to read the final log
+    Option to copy the final log on the device (if not read only)
+    
+03/10/2018
+    Scan stat (device scan, virus detected, virus removed) and log cleaner
+    Get one final log per device scanned
+    Analyze with ClamAV
+	
+29/09/2018
+    Manage read only devices
+    
+21/09/2018
+    Configuration mode to chose scanners and auto configure the station 
+    Go with Python 3.5 to get maximum performance out of os.walk()
+    
+04/09/2018
+    When a drive is detected, wait the drive to be ready to scan its devices
+    When a device is chosen (manually or not), wait the device to be ready to scan its files (now = no files to analyze) 
+        virtualCD                         
+        USB Thumb                             
+        Hard drive with multiple partition

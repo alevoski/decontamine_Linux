@@ -94,22 +94,28 @@ def version():
     '''
     Return version informations of Sophos
     '''
-    cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Released"'
+    # cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Released"'
+    cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Data file date"'
     vertemp = str(subprocess.check_output(cmdline, shell = True), 'utf-8').splitlines()
     
     finalrestemp = ""
     dictelemToreplace = {'Product version':'Prod_ver', 
     'Engine version':'/Eng_ver',
     'Virus data version':'/VirusDAT_ver',
-    'Released':'/'}
+    'Data file date':'/'}
     
     for elem in vertemp:
         for k, v in dictelemToreplace.items():
             if k in elem:
-                finalrestemp = finalrestemp + elem.replace(k, v)
-
-    # print(" ".join(finalrestemp.replace(':','').split()))
-    return(" ".join(finalrestemp.replace(':','').split()))
+                if 'Data file date' not in elem:
+                    finalrestemp = finalrestemp + elem.replace(k, v)
+                else: #'Data file date' in elem
+                    lastDatetemp = elem.replace(k, v) #we only want last date in result
+    lastDate = re.findall(':(.*)', lastDatetemp)[0]
+    # print(lastDate)
+    finalres = " ".join(finalrestemp.replace(':','').split()) + '/' + lastDate
+    # print(finalres)
+    return finalres
     
 if __name__ == '__main__':
     version()

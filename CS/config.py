@@ -39,6 +39,7 @@ def init():
             toolsDict = {}
             for elem in scanners:
                 tool = elem.lower()
+                # print(tool)
                 # try:
                 tocall = commontools.import_from(tool, 'version')
                 itemVersion = tocall()
@@ -130,7 +131,7 @@ def setConfInfos(cfgFile, presentTools):
         f = open(cfgFile, "a", encoding="utf-8", errors='ignore')
         f.write('##\n'+name+"\n"+actif+"\n")    
         f.close()
-        toolLST.append(name)
+        toolLST.append(tool)
         
     return toolLST
     
@@ -174,11 +175,9 @@ def configurator(avcompatibleDict):
                 for key, av in avcompatibleDict.items():      
                     print(key)
             elif '2' in str(rep):
-                desactiverAv = activationQuestion(disabledTools, 'activated', 'activate', '\nActivate antivirus \n', 'antivirus')            
-                res = activationExec(desactiverAv, 1, 'activé', filepath, 'name = ')
+                activationQuestion(disabledTools, 'activated', 'activate', '\nActivate antivirus \n', 'antivirus', filepath)            
             elif '3' in str(rep):
-                activerAv = activationQuestion(activeTools, 'disabled', 'disable', '\nDisable antivirus \n', 'antivirus')
-                res = activationExec(activerAv, 0, 'disabled', filepath, 'name = ')
+                activationQuestion(activeTools, 'disabled', 'disable', '\nDisable antivirus \n', 'antivirus', filepath)
             elif '4' in str(rep):
                 os.remove(filepath)
                 return -1
@@ -191,10 +190,10 @@ def configurator(avcompatibleDict):
                         screen.cprint(8,0, key+'\n')  
                 elif '6' in str(rep):
                     desactiverMod = activationQuestion(disabledToolsMod, 'activés', 'activer', '\nActiver des modules \n', 'modules')            
-                    res = activationExec(desactiverMod, 1, 'activé', filepath2, 'module_name = ')
+                    # res = activationExec(desactiverMod, 1, 'activé', filepath2, 'module_name = ')
                 elif '7' in str(rep):
                     activerMod = activationQuestion(activeToolsMod, 'désactivés', 'désactiver', '\nDésactiver des modules \n', 'modules')
-                    res = activationExec(activerMod, 0, 'désactivé', filepath2, 'module_name = ')
+                    # res = activationExec(activerMod, 0, 'désactivé', filepath2, 'module_name = ')
                 elif '8' in str(rep):
                     os.remove(filepath2)
                     return False
@@ -204,14 +203,13 @@ def configurator(avcompatibleDict):
     else:
         return False
     
-def activationQuestion(disabledToolsLST, etat, actif, affichage, elem):
+def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath):
     '''
     Configuration mode - enable/disable av and modules
     Take av and modules list and things to be printed.
     Ask question for each tools in the list.
-    Return av and modules list to be modified.
+    Sed the file to mod tool state if user wants to.
     ''' 
-    avEtatAMod = []
     if len(disabledToolsLST) > 0:
         print(colored(affichage, 'blue', 'on_white'))
         for tool in disabledToolsLST:
@@ -219,66 +217,24 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem):
             while True:
                 rep3 = getch.getch()
                 if 'y' in str(rep3):
-                    # print(" save ")
-                    avEtatAMod.append(tool)
+                    toMod = 0 #disable
+                    if actif == 'activate':
+                        toMod = 1
+                    # sed -i '/ClamAV/{n;s/.*/active = 0/}' /home/decontamine/decontamine.cfg
+                    os.system("sed -i '/" + tool + "/{n;s/.*/active = " + str(toMod) + "/}' " + filepath)
+                    print(tool + ' is now ' + actif)
                     break
                 elif 'n' in str(rep3):
                     # print(" unsave")
                     break
     else:
         print("All the " + elem + " are " + etat)
-    return avEtatAMod
-    
-def activationExec(lstAv, toMod, newStat, filepath, theName):
-    '''
-    Rewrite .ini file (enable/disable) to take the changes into account
-    Take av list and modules to enable/disable, 
-    the value to write in the .ini file, it's printed value,
-    and the path of the .ini file
-    '''
-    if len(lstAv) > 0:#Si des av sont à activer ou à désactiver
-        # print(lstAv)
-        #On copie le fichier ini dans une liste et on remplace les lignes "actives" le cas échéant
-        f = open(filepath,'r')
-        tempFile = f.readlines()
-        newList = []
-        f.close()
-        # print(tempFile)
-        # tempFile.remove('##\n')
-        # tempFile.remove('\n')
         
-        for item in tempFile:
-            if '##' not in item:
-                newList.append(item.replace('\n',''))
-                # print(item)
-        # print(newList)
-        #Suppression et écriture du fichier .ini avec les nouveaux params
-        os.remove(filepath)
-        for i, line in enumerate(newList):
-            if theName in line:
-                if logManagement.extractSTR(newList[i], theName) in lstAv:
-                    # print("hello")
-                    name = theName + logManagement.extractSTR(newList[i], theName) 
-                    actif = 'active = '+str(toMod)
-                    print(logManagement.extractSTR(newList[i], theName) + ' is now ' + newStat)
-                else:#on garde la conf d'origine
-                    # print("non")
-                    avname = newList[i]
-                    if 'name = ' == theName:
-                        actif = newList[i+1]
-                    # else:
-                        # present = newList[i+1]
-                        # path = newList[i+2]
-                        # actif = newList[i+3]
-                   # print(line)
-                f = open(filepath, 'a', encoding='utf-8', errors='ignore')
-                if 'name = ' == theName:
-                    f.write('##\n' + name + '\n' + actif + '\n')    
-                # else:
-                    # f.write('##\n'+avname+"\n"+present+"\n"+path+"\n"+actif+"\n")    
-    return False    
-    
 if __name__ == '__main__':
-    init()
-        
+    # res = init()
+    # print(res)
+    rep = configurator(avcompatibleDict)
+    if rep == -1:
+        res = init()
+        print(res)
     
