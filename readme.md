@@ -4,12 +4,12 @@
 [![Language](https://img.shields.io/badge/language-python3-orange.svg)](https://www.python.org/)
 
 Decontamine_Linux is an USB devices cleaning station for Linux.  
-Started since September 2018  
-Coding and testing on Debian 9 64 bits with Python 3  
-Project ongoing  
+Started since September 2018.  
+Coding and testing on ***Debian 9*** 64 bits with Python 3.  
+Project ongoing.  
 
 ## Getting Started
-Download the project on your computer
+Download the project on your computer.
 ```
 git clone https://github.com/alevoski/decontamine_Linux.git
 ```
@@ -27,13 +27,13 @@ sudo chmod -R 757 /home/decontamine
 ***ONGOING***
 ```
 #### Install at list one this antivirus:
-ClamAV
+***ClamAV***
 ```
 apt-get update
 apt-get install clamav
 apt-get install clamav-daemon
 ```
-Sophos
+***Sophos***  
 Download it on [Sophos website](https://www.sophos.com/en-us/products/free-tools/sophos-antivirus-for-linux.aspx)  
 Install it without live protection  
 ```
