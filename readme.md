@@ -52,7 +52,7 @@ python3 main.py
 For more information, please read the [documentation](https://github.com/alevoski/decontamine_Linux/tree/master/DOCS) in DOCS/ directory
 
 ## Author
-Alexandre BuissÃ©
+Alexandre Buissé
 
 ## License
 Decontamine_Linux. USB cleaning devices station.
