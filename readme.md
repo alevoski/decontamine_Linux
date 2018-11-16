@@ -54,7 +54,7 @@ For more information, please read the [documentation](https://github.com/alevosk
 Alexandre Buissé
 
 ## License
-Decontamine_Linux. USB cleaning devices station.  
+Decontamine_Linux. USB devices cleaning station.  
 Copyright (C) 2018 Alexandre Buissé alexandre.buisse@gmail.com  
 
 This program is free software: you can redistribute it and/or modify  
