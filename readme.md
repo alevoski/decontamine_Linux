@@ -2,7 +2,6 @@
 [![License](https://img.shields.io/badge/licence-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0.en.html)
 [![Platform](https://img.shields.io/badge/platform-linux-lightgrey.svg)](https://www.linux.com/)
 [![Language](https://img.shields.io/badge/language-python3-orange.svg)](https://www.python.org/)
-[![LinkedIn](https://img.shields.io/badge/linkedIn-https%3A%2F%2Fwww.linkedin.com%2Fin%2Falexandre--buisse%2F-blue.svg)](https://www.linkedin.com/in/alexandre-buisse/)
 
 Decontamine_Linux is an USB devices cleaning station for Linux.  
 Started since September 2018  
