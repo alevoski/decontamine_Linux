@@ -4,10 +4,10 @@
 [![Language](https://img.shields.io/badge/language-python3-orange.svg)](https://www.python.org/)
 [![LinkedIn](https://img.shields.io/badge/linkedIn-https%3A%2F%2Fwww.linkedin.com%2Fin%2Falexandre--buisse%2F-blue.svg)](https://www.linkedin.com/in/alexandre-buisse/)
 
-Decontamine_Linux is an USB devices cleaning station for Linux
-Started since September 2018
-Coding and testing on Debian 9 64 bits with Python 3
-Project ongoing
+Decontamine_Linux is an USB devices cleaning station for Linux.  
+Started since September 2018  
+Coding and testing on Debian 9 64 bits with Python 3  
+Project ongoing  
 
 ## Getting Started
 Download the project on your computer
