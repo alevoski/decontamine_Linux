@@ -1,14 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - commontools.py
-#@Alexandre BuissÃ© - 2018
+#@Alexandre Buissé - 2018
 
-import select
 import re
-import tty
-import termios
-# from curties import Input
-import sys
 import getch
 from termcolor import colored
 import kbhitClass
