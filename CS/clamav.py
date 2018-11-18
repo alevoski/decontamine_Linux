@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - clamav.py
-#@Alexandre BuissÃ© - 2018
+#@Alexandre Buissé - 2018
 
 import commontools
 import logManagement
