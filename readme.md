@@ -26,7 +26,7 @@ sudo chmod -R 757 /home/decontamine
 ```
 pip install -r requirements.txt
 ```
-#### Install at least one this antivirus:
+#### Install at least one of this antivirus:
 ***ClamAV***
 ```
 apt-get update
