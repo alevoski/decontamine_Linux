@@ -84,7 +84,6 @@ def getLog(finalLog, mountPTS):
     if 'y' in str(rep):
         copiedFile = mountPTS + '/' + os.path.basename(finalLog)
         # print(finalLog)
-        # print(copiedFile)
         shutil.copy2(finalLog, copiedFile)
         # print(copiedFile)
         if os.path.isfile(copiedFile):
