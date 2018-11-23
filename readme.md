@@ -55,7 +55,7 @@ Alexandre Buissé
 
 ## License
 Decontamine_Linux. USB devices cleaning station.  
-Copyright (C) 2018 Alexandre Buissé alexandre.buisse@gmail.com  
+Copyright (C) 2018 Alexandre Buissé alevoski@pm.me
 
 This program is free software: you can redistribute it and/or modify  
 it under the terms of the GNU Affero General Public License as published  
