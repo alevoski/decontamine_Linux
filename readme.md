@@ -42,7 +42,7 @@ sudo ./sophos-av/install.sh --live-protection=false
 ```
 ***F-Secure***  
 Download it on [F-Secure website](https://www.f-secure.com/en/web/business_global/downloads/linux-security)  
-Install all dependencies based on [Pre installation checklist](https://community.f-secure.com/t5/Business/Pre-installation-checklist-for-F/ta-p/76128))  
+Install all dependencies based on [Pre installation checklist](https://community.f-secure.com/t5/Business/Pre-installation-checklist-for-F/ta-p/76128)  
 ```
 sudo dpkg --add-architecture i386
 sudo apt-get update
