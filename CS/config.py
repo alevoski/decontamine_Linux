@@ -12,7 +12,8 @@ from termcolor import colored
 import getch
 
 avcompatibleDict = {'ClamAV':'clamdscan',
-'Sophos':'savscan'}
+'Sophos':'savscan',
+'F-Secure':'fsav'}
 modulescompatibleDict = {}
 
 def init():

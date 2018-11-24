@@ -1,4 +1,16 @@
 CHANGELOG
+24/11/2018
+    Analyze with F-Secure
+        Get version informations
+        Can be enable/disable in config
+        Scan 
+        Support read only devices
+        Get virus in log
+            Virus name
+            Virus type
+            Removed or not
+        F-Secure integration
+
 11/11/2018
     No more crash after reseting the configuration
         Correction of a bug in function setConfInfos() in config module, it appended name instead of tool. 

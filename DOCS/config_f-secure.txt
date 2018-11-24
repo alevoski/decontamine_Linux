@@ -1,0 +1,48 @@
+https://help.f-secure.com/product.html#business/linux-security/11.10/en/concept_E15F132E67D94C27A275550B6652C730-11.10-en
+
+Download and install F-Secure Linux Security
+    Download
+        Go to https://www.f-secure.com/en/web/business_global/downloads/linux-security
+        Download the tgz file (~187 MO for fsls-11.10.68-rtm.tar.gz)
+    Dependencies (based on https://community.f-secure.com/t5/Business/Pre-installation-checklist-for-F/ta-p/76128)
+        sudo dpkg --add-architecture i386
+        sudo apt-get update
+        sudo apt-get install libpam-modules:i386 libstdc++6:i386 perl rpm zlib1g:i386
+    Install F-Secure with Command Line Scanner Only 
+        tar -xzvf fsls-11.10.68-rtm.tar.gz
+        sudo ./fsls-11.10.68-rtm/fsls-11.10.68 --command-line-only
+     
+Command to run on-demand scan
+     fsav --allfiles --archive --maxnested=15 --scantimeout=180 /deviceX
+     
+To get scan engine and database versions
+     fsav --version
+
+EXIT CODES
+       fsav has following exit codes:
+
+       0      Normal exit; no viruses or suspicious files found.
+
+       1      Fatal error; unrecoverable error.  (Usually a missing or corrupted file.)
+
+       3      A boot virus or file virus found.
+
+       4      Riskware (potential spyware) found.
+
+       6      At least one virus was removed and no infected files left.
+
+       7      Out of memory.
+
+       8      Suspicious files found; these are not necessarily infected by a virus.
+
+       9      Scan error, at least one file scan failed.
+
+       64 + return code above
+              Program was prematurely terminated by SIGIN after  something  abnormal  already
+              had been detected. Usually this means that the user pressed CTRL-C (64 means we
+              set the 7th bit to 1)
+
+       128 + signal number
+              Program was terminated by pressing CTRL-C, or by a sigterm or suspend event.
+
+    

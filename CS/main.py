@@ -17,7 +17,8 @@ import sys
 import os
 
 avcompatibleDict = {'ClamAV':'clamdscan',
-'Sophos':'savscan'}
+'Sophos':'savscan',
+'F-Secure':'fsav'}
 modulescompatibleDict = {}
 
 logDirectory = '/home/decontamine/'

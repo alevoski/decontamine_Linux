@@ -23,7 +23,6 @@ Bonus
 
 Top priorities
     Analyze with Kaspersky (https://support.kaspersky.com/kes10linux#downloads) 
-    Analyze with Comodo (https://www.comodo.com/home/internet-security/antivirus-for-linux.php)
     Analyze with Eset 
     Analyze with Bitdefender   
     Analyze with Avast    

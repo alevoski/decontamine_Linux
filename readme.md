@@ -40,6 +40,19 @@ Install it without live protection
 tar -xzvf sav-linux-free-9.tgz
 sudo ./sophos-av/install.sh --live-protection=false
 ```
+***F-Secure***
+Download it on [F-Secure website](https://www.f-secure.com/en/web/business_global/downloads/linux-security)  
+Install all dependencies based on [Pre installation checklist](https://community.f-secure.com/t5/Business/Pre-installation-checklist-for-F/ta-p/76128))  
+```
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get install libpam-modules:i386 libstdc++6:i386 perl rpm zlib1g:i386
+```
+Install it with Command Line Scanner Only  
+```
+tar -xzvf fsls-11.10.68-rtm.tar.gz
+sudo ./fsls-11.10.68-rtm/fsls-11.10.68 --command-line-only
+```
 
 ### HOW TO USE ?
 ```
