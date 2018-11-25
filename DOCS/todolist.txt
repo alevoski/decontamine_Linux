@@ -22,19 +22,19 @@ Bonus
     Send stats to web server
 
 Top priorities
+    Better presentation of the printed sentences
+    Put av modules in a separate folder
     Analyze with Kaspersky (https://support.kaspersky.com/kes10linux#downloads) 
+    Analyze with F-Prot (http://www.f-prot.com/download/home_user/download_fplinux.html) 
+    Analyze with Fortinet (https://forticlient.com/downloads) 
     Analyze with Eset 
     Analyze with Bitdefender   
-    Analyze with Avast    
-    Analyze with F-Prot (http://www.f-prot.com/download/home_user/download_fplinux.html)    
-    Analyze with F-Secure (https://www.f-secure.com/en/web/business_global/downloads/linux-security)    
+    Analyze with Avast       
     Analyze with ope (office, pdf and exe) module
     Option to stop the scan
         Considerate the stop in the final log
     Force umount (CD/DVD)
     Full umount
-    Better presentation of the printed sentences
-    Put av modules in a separate folder
 --------------------------------------------------------------------------------------------------------------------------------------------------
 ############################ONGOING############################
 Analyze with Sophos
