@@ -6,6 +6,7 @@
 import commontools
 import logManagement
 from datetime import datetime, timedelta
+from termcolor import colored
 
 def init(toolsDict, mountPoint, readOnly, logDirectory):
     '''
@@ -16,18 +17,18 @@ def init(toolsDict, mountPoint, readOnly, logDirectory):
     lstrm = []
     lstLogAV = []
     for k, v in toolsDict.items():
-        print('Init of the scan with ' + k + ' - begin')
+        print('\n' + colored('Init of the scan with ' + colored(k, 'green'), attrs=['bold']))
         tool = k.lower()
         # try:
         tocall = commontools.import_from(tool, 'init')
         res, logAVTemp = tocall(mountPoint, readOnly, logDirectory)
         lstLogAV.append(logAVTemp)
         if type(res) is dict:
-            print(k + ' found something !')
+            print(colored(k, 'green') + ' found something !')
             detected, lstrm = result(res, detected, lstrm)
         else:
-            print('No virus found with ' + k)
-        print('Scan with ' + k + ' - finish')
+            print('No virus found with ' + colored(k, 'green'))
+        print(colored('Scan finished with ' + colored(k, 'green'), attrs=['bold']))
     return detected, lstrm, lstLogAV
     
 def final(detected, lstrm, logDirectory):
@@ -50,11 +51,11 @@ def final(detected, lstrm, logDirectory):
     # print('allvirus : ', allVirus)
     if allVirus > 0:
         if len(lstrm) == len(detected):
-            resToShow = 'The ' + str(allVirus) + ' found virus(es) have been removed.'
+            resToShow = 'The ' + str(allVirus) + ' found virus(es) was/were removed.'
             for elem in lstrm:
                 logManagement.writeLog(logFile, elem + '\n', 'utf-8')
         else:
-            resToShow = '\n' + str(allVirus) + ' virus(es) have been detected, ' + str(len(lstrm)) + ' have been removed.'
+            resToShow = '\n' + str(allVirus) + ' virus(es) detected, ' + str(len(lstrm)) + ' removed.'
             for elem in detected:
                 logManagement.writeLog(logFile, elem + '\n', 'utf-8')
             for elem in lstrm:
@@ -68,7 +69,7 @@ def final(detected, lstrm, logDirectory):
     notrmVirusWrite = 'Nb virus not removed : ' + str(notremove)
     logManagement.writeLog(logFile, allVirusWrite + '\n' + rmVirusWrite + '\n' + notrmVirusWrite, 'utf-8')
     logManagement.writeLog(logFile, '\n' + resToShow, 'utf-8')
-    print(resToShow)
+    print(colored(resToShow, attrs=['bold']))
     
     return logFile
         

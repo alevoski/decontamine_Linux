@@ -63,12 +63,12 @@ def createTable(theDict, column1, column2):
     for item, value in theDict.items():
         # print(item)
         diffMax1 = max1-len(item)
-        theItem = item +" "*diffMax1+"|"
+        theItem = item +" "*diffMax1
         
         diffMax2 = max2-len(value)
         theValue = value +" "*diffMax2
 
-        print(colored(theItem, 'green'), colored(theValue, 'magenta'))
+        print(colored(theItem, 'green') + "|" + colored(theValue, 'magenta'))
         
 def extractNumber(line):
     '''Extract number dans rapport'''

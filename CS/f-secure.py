@@ -87,7 +87,7 @@ def scan(mountPts, readOnly, logFile):
         rep = commontools.prompter('Do you want to automaticly clean the device ? (y/n)')
         if 'y' in str(rep):
             cmdline = 'fsav --virus-action1=clean --virus-action2=remove --auto --allfiles --archive --maxnested=15 --scantimeout=180 ' + mountPts + ' >> ' + logFile
-    print('Scan with F-Secure - begin')
+    print('Scan begin')
     try:
         res = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
         # print(res)

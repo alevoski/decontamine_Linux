@@ -1,4 +1,6 @@
 CHANGELOG
+27/11/2018
+    Better presentation of the printed sentences
 24/11/2018
     Analyze with F-Secure
         Get version informations

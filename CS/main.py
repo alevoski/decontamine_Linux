@@ -76,11 +76,11 @@ def init():
     #Print stats
     nbScan, virusdetected, virusremoved = stats.stat(logDirectory)
     if nbScan > 1:
-        print("\n" + str(nbScan)+" devices have been scanned with success.")
+        print("\n" + colored(str(nbScan), 'yellow') + " devices have been scanned with success.")
     if (nbScan > 1) and (virusdetected > 1):
-        phrase = "And "+str(virusdetected)+" viruses have been detected !"
+        phrase = "And " + colored(str(virusdetected), 'yellow') + " viruses have been detected !"
         if (virusremoved > 1):
-            phrase = phrase + " ( "+str(virusremoved)+ " removed !)\n"
+            phrase = phrase + " ( " + colored(str(virusremoved), 'yellow') + " removed !)\n"
         print(phrase)
     
     while True:
@@ -109,9 +109,10 @@ def init():
             logFilePath1 = logDirectory + 'LOGS/' + str(datetime.now().strftime('%Y/%m/%d')) + '/' + datetime.now().strftime("%d%m%y%H%M%S")
             logFilePath = logFilePath1+"Log.txt"
         
+            print('\n' + '_'*30 + '\n')
             print('Device ' + label + ' detected')
             if readonly == 1:
-                print('\n' + label + ' is read-only, it will be impossible to remove viruses !')
+                print('\n' + label + ' is read-only, ' + colored('it will be impossible to remove viruses !', attrs=['bold']))
 
             element1 = "-------------------------Device scanned : ''"+str(label)+"'' --------------\n"
             element1b = "-------------------------Read-only : "+str(readonly)+" --------------\n"
@@ -128,7 +129,7 @@ def init():
                 if len(filesLst) > 0:
                     # print(filesLst)
                     filePrint = str(len(filesLst)) + ' files to analyze on the device "' + label + '"'
-                    print(filePrint)
+                    print(colored(str(len(filesLst)), 'yellow') + ' files to analyze on the device "' + label + '"')
                     logManagement.writeLog(logFilePath, filePrint+'\n', 'utf-8')
                     for files in filesLst:
                         logManagement.writeLog(logFilePath, files+'\n', 'utf-8')
@@ -139,17 +140,19 @@ def init():
                 time.sleep(0.5) #Let the time for the system to get the files
                 test +=1
             if len(filesLst) > 0:
-                print('Beginning of the analyze, please wait !')
+                print('\nBeginning of the analyze, please wait !')
                 # 1 - init scanning tools
                 lstnotRM, lstrm, lstLogAV = analyze.init(res, mountpoint, readonly, logFilePath1)
                 
                 # 2 - print scan results
+                print('\n' + '_'*30 + '\n')
+                print(colored('Analyze is finished !', attrs=['bold']))
                 logFinalTemp = analyze.final(lstnotRM, lstrm, logFilePath1)
                 
                 endScan = time.time()
                 totalTimeScan = endScan - beginScan
-                totalTime = 'Device analyze in '+str(round(totalTimeScan, 5)) + ' seconds.'
-                print(totalTime)
+                totalTime = 'Device analyzed in '+str(round(totalTimeScan, 5)) + ' seconds.'
+                print('Device analyzed in ' + colored(str(round(totalTimeScan, 5)), 'yellow') + ' seconds.\n')
                 logManagement.writeLog(logFinalTemp, '\n'+totalTime, 'utf-8')
                 
                 # 3 - concat all logs in one final log

@@ -75,10 +75,10 @@ def scan(mountPts, readOnly, logFile):
     cmdline = 'savscan -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
     if readOnly == False:
         cmdline = 'savscan -remove -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
-    print('Scan with Sophos - begin')
+    print('Scan begin')
     try:
         res = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
-        print(res)
+        # print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
     except subprocess.CalledProcessError as e:#Error

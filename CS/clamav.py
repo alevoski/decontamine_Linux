@@ -72,10 +72,10 @@ def scan(mountPts, readOnly, logFile):
             cmdline = 'clamdscan -v -m --remove --fdpass -l ' + logFile + ' ' + mountPts
         elif 'n' in str(rep):
             pass
-    print('Scan with ClamAV - begin')
+    print('Scan begin')
     try:
         res = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
-        print(res)
+        # print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
     except subprocess.CalledProcessError as e:#Error

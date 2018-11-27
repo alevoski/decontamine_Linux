@@ -22,7 +22,6 @@ Bonus
     Send stats to web server
 
 Top priorities
-    Better presentation of the printed sentences
     Put av modules in a separate folder
     Analyze with Kaspersky (https://support.kaspersky.com/kes10linux#downloads) 
     Analyze with F-Prot (http://www.f-prot.com/download/home_user/download_fplinux.html) 
@@ -39,4 +38,5 @@ Top priorities
 ############################ONGOING############################
 Analyze with Sophos
     TO DO/ONGOING
-        Quickly get version information (~10 sec now)
+        Quickly get version information (~10 sec now) (write info in a file
+        reload if file older than 1 hour)
