@@ -24,10 +24,10 @@ def init(toolsDict, mountPoint, readOnly, logDirectory):
         res, logAVTemp = tocall(mountPoint, readOnly, logDirectory)
         lstLogAV.append(logAVTemp)
         if type(res) is dict:
-            print(colored(k, 'green') + ' found something !')
+            print('\n'+colored(k, 'green') + ' found something !')
             detected, lstrm = result(res, detected, lstrm)
         else:
-            print('No virus found with ' + colored(k, 'green'))
+            print('\nNo virus found with ' + colored(k, 'green'))
         print(colored('Scan finished with ' + colored(k, 'green'), attrs=['bold']))
     return detected, lstrm, lstLogAV
     
