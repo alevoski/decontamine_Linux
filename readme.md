@@ -61,10 +61,10 @@ python3 main.py
 ```
 
 #### Demos  
-*** Classical USB thumb key scanning ***  
+*** Classical USB flash drive scanning ***  
 ![](DOCS/DEMOS/virus-scan1.gif)  
 
-*** Optical drive scanning ***  
+*** CD-ROM scanning ***  
 ![](DOCS/DEMOS/virus-scan2-read-only.gif)  
 
 *** Multiple devices USB hard drive scanning***  
