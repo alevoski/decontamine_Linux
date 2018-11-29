@@ -60,8 +60,18 @@ cd CS/
 python3 main.py
 ```
 
-#### Demo  
-![](virus-scan1.gif)  
+#### Demos  
+*** Classical USB thumb key scanning ***  
+![](DOCS/DEMOS/virus-scan1.gif)  
+
+*** Optical drive scanning ***  
+![](DOCS/DEMOS/virus-scan2-read-only.gif)  
+
+*** Multiple devices USB hard drive scanning***  
+![](DOCS/DEMOS/virus-scan3-multi-devices-drive.gif)  
+
+*** Configuration editor ***  
+![](DOCS/DEMOS/conf.gif)  
 
 ## Documentation
 For more information, please read the [documentation](https://github.com/alevoski/decontamine_Linux/tree/master/DOCS) in DOCS/ directory
