@@ -1,0 +1,75 @@
+How I made my demo GIFs
+I followed this very good tutorial : https://www.foell.org/justin/creating-an-animated-gif-using-vlc-gimp/
+
+1) Shoot the video
+With VLC, film your desktop with 2 FPS
+Go to "Media/Convert/Save..."
+    Capture Device
+        Capture mode : Desktop
+        Options : 2 FPS
+    Profile
+        Video H.264 (in the settings I disabled the audio)
+    Choose a destination file the start
+When you have nothing more to film, press the stop button in VLC.
+
+2) Get the image files from the video
+I used "avconv" on my Debian
+   sudo apt-get update
+   sudo apt-get install libav-tools
+   avconv -i [YOURVIDEFILE.mp4] -r 2 [OUTPUTPATH/img-%3d.png]
+
+3) Sort your IMG
+Remove the imgs you don't need for your GIF
+  
+4) Create the GIF
+I used GIMP
+Open GIMP
+    File/Open as Layers
+    Select all your IMG files for the GIF you want to create
+
+If you don't see all your layers in a column
+    Windows/Dockable Dialogs/ Layers
+
+Use the eyes ico to work on a specif img (ie : add some texts)
+To add text
+    Right click on the img/Tools/Text
+    you may have to go to the layers column to choose for which img the text will apply
+    ie :
+        img 490...
+        textX : the text
+        img 457 : the img I want to have a text
+        img 433...
+    To merge the text with the img 
+        you should lock the imgs under this img
+        then right click on the text => Merge Down
+    
+To reduce the size
+    Keep the essential by cropping
+        Tools/Selection Tools/Rectangle Select
+        Select the area you want to keep (it will be the same area for all the IMGs of your project)
+        Then crop
+            Image/Crop to Selection
+    Keep a low level of colors
+        Image/Mode
+            Indexed...
+                I chose to keep 63 colors 
+                Convert
+    I didn't use the GIF filter but I you want to:
+        Filters/Animation/Optimize (for GIF)
+     
+Choose a tempo for each img
+    On the layers column, right click on each img
+        Edit Layer Attributes
+            Layer name = img-457.png(2000ms)
+    My img num 457 will be show for 2 seconds.
+     
+Export your project  
+    File/Export As...
+        mygif1.gif => Export
+            Gif comment => don't use any accent
+            As animation, the rest by default
+    
+5) Test your GIF
+You can test your creations with https://giphy.com/upload
+
+           
