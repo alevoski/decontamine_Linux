@@ -34,9 +34,3 @@ Top priorities
         Considerate the stop in the final log
     Force umount (CD/DVD)
     Full umount
---------------------------------------------------------------------------------------------------------------------------------------------------
-############################ONGOING############################
-Analyze with Sophos
-    TO DO/ONGOING
-        Quickly get version information (~10 sec now) (write info in a file
-        reload if file older than 1 hour)

@@ -7,6 +7,8 @@ import logManagement
 import commontools
 import os
 import sys
+from datetime import datetime, timedelta
+import time
 import subprocess
 from termcolor import colored
 import getch
@@ -20,7 +22,7 @@ def init():
     '''
     Verify 
         if av or scanning modules are present on the system
-            if the conf file exist (decontamine.cfg) it return the list of av and modules activated, 
+            if the conf file exist (decontamine.cfg) it return the dict of av and modules activated, 
             else it creates it with all activated by default
         else exit the program
     '''
@@ -34,21 +36,10 @@ def init():
         if os.path.isfile(cfgFile):
             scanners, disabledScanners = getConfInfos(cfgFile)
         else:
+            print('Conf file will be created')
             scanners = setConfInfos(cfgFile, presentTools)
-        if scanners != []:
-            # Get av versions
-            toolsDict = {}
-            for elem in scanners:
-                tool = elem.lower()
-                # print(tool)
-                # try:
-                tocall = commontools.import_from(tool, 'version')
-                itemVersion = tocall()
-                # print(itemVersion)
-                toolsDict[elem] = itemVersion
-                # except Exception:
-                    # pass
-            return toolsDict
+        if scanners != {}:
+            return scanners
         else:
             #no av or scanning modules activated on the system
             os.system('clear')
@@ -58,7 +49,6 @@ def init():
             print(line1 + line2 + line3)
             rep = configurator(avcompatibleDict)  
             return rep
-            # init()
     else:
         #no av or scanning modules present on the system
         line1 = colored('No antivirus or scanning modules installed on the system, please ', 'red', attrs=['bold'])
@@ -85,6 +75,32 @@ def finder(dictElem, option):
                 pass
             # print(k + ' : ' + str(rep)) 
     return elemFind
+    
+def getVersion(elem):
+    '''
+    Return cleaning tool version passed in parameter
+    '''
+    tool = elem.lower()
+    tocall = commontools.import_from(tool, 'version')
+    itemVersion = tocall()
+    return itemVersion
+    
+def confUpdate(filename):
+    '''
+    Determine if the conf file must be update
+    '''
+    lastFileUpdate = os.path.getmtime(filename)
+    fileTime = datetime.fromtimestamp(lastFileUpdate)
+    timeNow = datetime.now()
+    diff = timeNow - fileTime
+    diffHours = diff.total_seconds()/3600
+    # print(diff)
+    # print(diff.total_seconds())
+    # print(diffHours)
+    if diffHours > 5:#update version information each 5 hours
+        return 1
+    else:
+        return 0
         
 def getConfInfos(cfgFile):
     '''
@@ -94,27 +110,31 @@ def getConfInfos(cfgFile):
     tempFile = []
     tempFile = f.readlines()
     f.close()
-    toolLST = []
+    toolsDict = {}
     toolLSTDisabled = []
+    
+    toupdate = confUpdate(cfgFile)
 
     for i, line in enumerate(tempFile):
         # print(line)
         if 'active = 1' in line:
-            name = tempFile[i-1]
-            # print(name)
-            temp = logManagement.extractSTR(tempFile[i-1], 'name = ')
-            # print(temp)
-            # temp = re.split('name = ', name)[-1]
-            # print(temp.replace('\n',''))
-            toolLST.append(temp.replace('\n',''))
+            toolTemp = tempFile[i-1]
+            tool = logManagement.extractSTR(tempFile[i-1], 'name = ')
+            if toupdate == 1:#get tool version and update file 
+                version = str(getVersion(tool))
+                #update version
+                # sed -i '/ClamAV/{n;n;s/.*/version = 0.8/}' /home/decontamine/decontamine.cfg
+                os.system("sed -i '/" + tool + "/{n;n;s/.*/version = " + str(version).replace('/','\/') + "/}' " + cfgFile)
+            else:
+                version = logManagement.extractSTR(tempFile[i+1], 'version = ')
+            toolsDict[tool] = str(version)
         if 'active = 0' in line:
-            name = tempFile[i-1]
-            # temp = re.split('name = ', name)[-1]
-            temp = logManagement.extractSTR(tempFile[i-1], 'name = ')
-            temp.replace('\n','')
-            toolLSTDisabled.append(temp.replace('\n',''))
+            toolTemp = tempFile[i-1]
+            tool = logManagement.extractSTR(tempFile[i-1], 'name = ')
+            tool.replace('\n','')
+            toolLSTDisabled.append(tool.replace('\n',''))
         
-    return toolLST, toolLSTDisabled
+    return toolsDict, toolLSTDisabled
     
 def setConfInfos(cfgFile, presentTools):
     '''
@@ -124,17 +144,19 @@ def setConfInfos(cfgFile, presentTools):
     f = open(cfgFile,'w')
     f.close()
     
-    toolLST = []
+    toolsDict = {}
 
     for tool in presentTools:
-        name = 'name = '+str(tool)
+        name = 'name = ' + str(tool)
         actif =  'active = 1'
+        versionTemp = getVersion(tool)
+        version = 'version = '+ str(versionTemp)
         f = open(cfgFile, "a", encoding="utf-8", errors='ignore')
-        f.write('##\n'+name+"\n"+actif+"\n")    
+        f.write('##\n'+name+"\n"+actif+"\n"+version+"\n")    
         f.close()
-        toolLST.append(tool)
+        toolsDict[tool] = str(versionTemp)
         
-    return toolLST
+    return toolsDict
     
 def configurator(avcompatibleDict):
     '''
@@ -220,6 +242,12 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath)
                 if 'y' in str(rep3):
                     toMod = 0 #disable
                     if actif == 'activate':
+                        #Get tool version
+                        print('Getting ' + tool + ' version information')
+                        version = str(getVersion(tool))
+                        #update version
+                        # sed -i '/ClamAV/{n;n;s/.*/version = 0.8/}' /home/decontamine/decontamine.cfg
+                        os.system("sed -i '/" + tool + "/{n;n;s/.*/version = " + str(version).replace('/','\/') + "/}' " + filepath)
                         toMod = 1
                     # sed -i '/ClamAV/{n;s/.*/active = 0/}' /home/decontamine/decontamine.cfg
                     os.system("sed -i '/" + tool + "/{n;s/.*/active = " + str(toMod) + "/}' " + filepath)
@@ -232,10 +260,12 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath)
         print("All the " + elem + " are " + etat)
         
 if __name__ == '__main__':
-    # res = init()
-    # print(res)
-    rep = configurator(avcompatibleDict)
-    if rep == -1:
-        res = init()
-        print(res)
+    res = init()
+    print('scanners :', res)
+    # rep = configurator(avcompatibleDict)
+    # if rep == -1:
+        # res = init()
+        # print(res)
+    # print(confUpdate("/home/decontamine/decontamine.cfg"))
+        
     

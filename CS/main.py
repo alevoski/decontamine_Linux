@@ -59,8 +59,6 @@ def init():
     now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
     print("\nBegin: {d}".format(d=now) + '\n')
     
-    begin = datetime.now()
-    
     #Test if av or scan modules are present on the system and activated
     res = config.init() #will exit program if no tools find
     if res == -1:
