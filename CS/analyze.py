@@ -3,7 +3,7 @@
 #Decontamine Linux - analyze.py
 #@Alexandre Buissé - 2018
 
-import commontools
+from commontools import import_from
 import logManagement
 from datetime import datetime, timedelta
 from termcolor import colored
@@ -19,9 +19,10 @@ def init(toolsDict, mountPoint, readOnly, logDirectory):
     for k, v in toolsDict.items():
         print('\n' + colored('Init of the scan with ' + colored(k, 'green'), attrs=['bold']))
         tool = k.lower()
+        toolPath = 'tools_scripts'
         # try:
-        tocall = commontools.import_from(tool, 'init')
-        res, logAVTemp = tocall(mountPoint, readOnly, logDirectory)
+        tocall = import_from(toolPath, tool)
+        res, logAVTemp = tocall.init(mountPoint, readOnly, logDirectory)
         lstLogAV.append(logAVTemp)
         if type(res) is dict:
             print('\n'+colored(k, 'green') + ' found something !')

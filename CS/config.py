@@ -4,11 +4,10 @@
 #@Alexandre Buissé - 2018
 
 import logManagement
-import commontools
+from commontools import import_from
 import os
 import sys
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
 import subprocess
 from termcolor import colored
 import getch
@@ -81,10 +80,11 @@ def getVersion(elem):
     Return cleaning tool version passed in parameter
     '''
     tool = elem.lower()
-    tocall = commontools.import_from(tool, 'version')
-    itemVersion = tocall()
+    toolPath = 'tools_scripts'
+    tocall = import_from(toolPath, tool)
+    itemVersion = tocall.version()
     return itemVersion
-    
+        
 def confUpdate(filename):
     '''
     Determine if the conf file must be update

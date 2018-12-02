@@ -1,4 +1,7 @@
 CHANGELOG
+02/12/2018
+    Put cleaning tools scripts in a separate subfolder
+
 01/12/2018
     Version information
         Save cleaning tools version information into config file decontamine.cfg
