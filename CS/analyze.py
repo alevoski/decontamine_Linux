@@ -1,12 +1,15 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - analyze.py
-#@Alexandre Buissé - 2018
+#@Alexandre BuissÃ© - 2018
 
-from commontools import import_from
-import logManagement
-from datetime import datetime, timedelta
+#Standard imports
+from datetime import datetime
 from termcolor import colored
+
+#Project modules imports
+from commontools import import_from
+from logManagement import writeLog
 
 def init(toolsDict, mountPoint, readOnly, logDirectory):
     '''
@@ -31,7 +34,7 @@ def init(toolsDict, mountPoint, readOnly, logDirectory):
             print('\nNo virus found with ' + colored(k, 'green'))
         print(colored('Scan finished with ' + colored(k, 'green'), attrs=['bold']))
     return detected, lstrm, lstLogAV
-    
+
 def final(detected, lstrm, logDirectory):
     '''
     Print the final scan results
@@ -40,44 +43,39 @@ def final(detected, lstrm, logDirectory):
     # print('RM : ' + str(len(lstrm)) + str(lstrm))
     logFile = logDirectory + 'tempRes'
     finalSummary = '\n' + '-'*5 + ' *****FINAL RESULT***** ' + 5* '-' + '\n'
-    logManagement.writeLog(logFile, finalSummary, 'utf-8')
-    
+    writeLog(logFile, finalSummary, 'utf-8')
+
     allVirus = len(detected)
-    # allVirus = 0
-    # for notrmvirus in detected:
-        # if notrmvirus not in lstrm:
-            # allVirus +=1
-            
-    
-    # print('allvirus : ', allVirus)
+
     if allVirus > 0:
         if len(lstrm) == len(detected):
             resToShow = 'The ' + str(allVirus) + ' found virus(es) was/were removed.'
             for elem in lstrm:
-                logManagement.writeLog(logFile, elem + '\n', 'utf-8')
+                writeLog(logFile, elem + '\n', 'utf-8')
         else:
             resToShow = '\n' + str(allVirus) + ' virus(es) detected, ' + str(len(lstrm)) + ' removed.'
             for elem in detected:
-                logManagement.writeLog(logFile, elem + '\n', 'utf-8')
+                writeLog(logFile, elem + '\n', 'utf-8')
+            writeLog(logFile, '---REMOVED---\n', 'utf-8')
             for elem in lstrm:
-                logManagement.writeLog(logFile, elem + '\n', 'utf-8')
+                writeLog(logFile, elem + '\n', 'utf-8')
     else:
         resToShow = 'No virus found on your device.'
-        
+
     allVirusWrite = 'Nb virus found : ' + str(allVirus)
     rmVirusWrite = 'Nb virus removed : ' + str(len(lstrm))
     notremove = len(detected) - len(lstrm)
     notrmVirusWrite = 'Nb virus not removed : ' + str(notremove)
-    logManagement.writeLog(logFile, allVirusWrite + '\n' + rmVirusWrite + '\n' + notrmVirusWrite, 'utf-8')
-    logManagement.writeLog(logFile, '\n' + resToShow, 'utf-8')
+    writeLog(logFile, allVirusWrite + '\n' + rmVirusWrite + '\n' + notrmVirusWrite, 'utf-8')
+    writeLog(logFile, '\n' + resToShow, 'utf-8')
     print(colored(resToShow, attrs=['bold']))
-    
+
     return logFile
-        
+
 def result(res, detected, rm):
     '''
     Take a virus dictionary and two lists of previously not removed virus and removed virus
-    Return lists of virus detected and virus removed 
+    Return lists of virus detected and virus removed
     '''
     # print('****')
     # print('res : ', str(res))
@@ -87,16 +85,16 @@ def result(res, detected, rm):
         # print(k)
         removed = v['removed']
         if removed == 1:
-            if k not in rm: 
+            if k not in rm:
                 # print(k, 'removed')
                 rm.append(k)
         # else:
         if k not in detected:
             # print(k, 'detected')
             detected.append(k)
-        
+
     return detected, rm
-        
+
 if __name__ == '__main__':
     detected = []
     lstrm = []
@@ -117,6 +115,3 @@ if __name__ == '__main__':
     print(logFilePath)
     # result(dictTestFound)
     # result(dictTestFoundPartialDel)
-    
-    
-    

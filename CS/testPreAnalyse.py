@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - testPreAnalyse.py
-#@Alexandre Buissé - 2018
+#@Alexandre BuissÃ© - 2018
 
-import dbus
-import sys
+#Standard imports
+import time
 import getpass
 import os
-import time
 import getch
+import dbus
 
 def deviceInfo():
     '''
@@ -21,28 +21,28 @@ def deviceInfo():
     # i = 0
     objDict = {}
     # for items in iface.GetManagedObjects():
-    for k,v in iface.GetManagedObjects().items():
+    for k, v in iface.GetManagedObjects().items():
         # print(i, items)
         # print(str(items))
         try:
             # 1 - Get all drives
             # objItems = bus.get_object('org.freedesktop.UDisks2', items)
-            objItems = v.get('org.freedesktop.UDisks2.Drive', {})   
+            objItems = v.get('org.freedesktop.UDisks2.Drive', {})
             # print(objItems)
             # ifaceItems = dbus.Interface(objItems, 'org.freedesktop.DBus.Properties')
             # print(ifaceItems.GetAll('org.freedesktop.UDisks2.Drive'))
-            # id = ifaceItems.Get('org.freedesktop.UDisks2.Drive', 'Id')
-            id = objItems.get('Id')
-            # driveType = ifaceItems.Get('org.freedesktop.UDisks2.Drive', 'Media') #clé ou autre
-            driveType = objItems.get('Media') #clé ou autre
+            # objID = ifaceItems.Get('org.freedesktop.UDisks2.Drive', 'Id')
+            objID = objItems.get('Id')
+            # driveType = ifaceItems.Get('org.freedesktop.UDisks2.Drive', 'Media') #usb drive key or other
+            driveType = objItems.get('Media') #usb drive key or other
             # ejectable = ifaceItems.Get('org.freedesktop.UDisks2.Drive', 'Ejectable')
             ejectable = objItems.get('Ejectable')
             # driveBus = ifaceItems.Get('org.freedesktop.UDisks2.Drive', 'ConnectionBus') #usb, cd, etc
             driveBus = objItems.get('ConnectionBus') #usb, cd, etc
-            
+
             # available = objItems.get('MediaAvailable') #usb, cd, etc
             # print('available : ', available)
-            
+
             # 2 - Get devices list of the founded drive
             # print('driveType :', driveType)
             # print('driveTypeLen :', len(driveType))
@@ -57,19 +57,19 @@ def deviceInfo():
                     # print('ejectable', int(ejectable))
                     # print('driveType', str(driveType))
                     # print('driveBus', str(driveBus))
-                    objDict[str(id)] = {'ejectable':int(ejectable), 
-                    'type':str(driveType),
-                    'bus':str(driveBus),
-                    'devices':devices}
+                    objDict[str(objID)] = {'ejectable':int(ejectable),
+                                           'type':str(driveType),
+                                           'bus':str(driveBus),
+                                           'devices':devices}
                     # print(objDict)
-         
+
             # print('\n')
         except Exception:
             pass
- 
+
     return objDict
-    
-def devicesList(id, driveType, driveBus, ejectable):
+
+def devicesList(objID, driveType, driveBus, ejectable):
     '''
     Get devices list of a drive passed in parameter.
     Use mountPtsList() to get mounts points of devices
@@ -78,12 +78,12 @@ def devicesList(id, driveType, driveBus, ejectable):
     bus = dbus.SystemBus()
     obj = bus.get_object('org.freedesktop.UDisks2', '/org/freedesktop/UDisks2')
     iface = dbus.Interface(obj, 'org.freedesktop.DBus.ObjectManager')
-    
+
     # print('driveType', driveType)
     # print('ejectable', ejectable)
     # print('driveBus', driveBus)
-    # print('id', id)
-    
+    # print('id', objID)
+
     devices = {}
     testHDD = 29
     if driveBus == 'usb' and len(driveType) == 0 and ejectable == '0':#Maybe an hard drive disk so maybe more than one device on it
@@ -92,12 +92,12 @@ def devicesList(id, driveType, driveBus, ejectable):
     if driveType != '' or driveBus != '':
         while testHDD < 30:
             oldDeviceDict = devices
-            for k,v in iface.GetManagedObjects().items():
+            for k, v in iface.GetManagedObjects().items():
                 drive_info = v.get('org.freedesktop.UDisks2.Block', {})
                 # devices = {}
-                # print(str(id))
+                # print(str(objID))
                 # print(str(drive_info.get('Drive')))
-                if str(id) in str(drive_info.get('Drive')):
+                if str(objID) in str(drive_info.get('Drive')):
                     if drive_info.get('IdUsage') == "filesystem" and not drive_info.get('HintSystem'):# and not drive_info.get('ReadOnly'):
                         # print('\nok\n')
                         device = drive_info.get('Device')
@@ -108,7 +108,7 @@ def devicesList(id, driveType, driveBus, ejectable):
                         # print('readOnly', readOnly)
                         # print('drive', drive_info.get('Drive'))
                         # print('label', str(label))
-                        
+
                         # print('lenlabel : ', len(label))
                         if len(label) != 0:
                             # print('label ok')
@@ -126,28 +126,26 @@ def devicesList(id, driveType, driveBus, ejectable):
                                         mountPts = mountPtsList(str(label))
                                     except Exception:
                                         pass
-                                
+
                                 # For drives with more than 1 devices
                                 if mountPts == '?':
                                     try:
                                         mountPts = mountPtsDIR(str(label))
                                     except Exception:
                                         pass
-                                                                  
+
                                 if mountPts != '?':
                                     test = 30
                                     break
                                 # print(test)
                                 time.sleep(1)
-                                test +=1
-                            
-                        
-                            devices[str(device)] = {'label':str(label), 
-                            'readOnly':int(readOnly),
-                            'mountPts':str(mountPts)
-                            }
+                                test += 1
+
+                            devices[str(device)] = {'label':str(label),
+                                                    'readOnly':int(readOnly),
+                                                    'mountPts':str(mountPts)}
             # print(devices)
-            testHDD +=1
+            testHDD += 1
             if len(devices) > 0:
                 time.sleep(1)
             # print(len(devices),len(oldDeviceDict))
@@ -156,11 +154,11 @@ def devicesList(id, driveType, driveBus, ejectable):
                 # print('n device')
                 testHDD = 1
             else:
-                testHDD +=5
+                testHDD += 5
             # print(testHDD)
-            
+
     return devices
-        
+
 def mountPtsList(device):
     '''
     Get mount point of a device label passed in parameter.
@@ -169,18 +167,18 @@ def mountPtsList(device):
     '''
     # print(device, ' tested')
     mntptsRt = '?'
-    
+
     # Method 1 - Filesystem (UDisks2)
-    
+
     bus = dbus.SystemBus()
     obj = bus.get_object('org.freedesktop.UDisks2', '/org/freedesktop/UDisks2')
     iface = dbus.Interface(obj, 'org.freedesktop.DBus.ObjectManager')
 
-    for k,v in iface.GetManagedObjects().items():
+    for k, v in iface.GetManagedObjects().items():
         mount_point = ''
         drive_info = v.get('org.freedesktop.UDisks2.Filesystem', {})
         # devices = {}
-        # print(str(id))
+        # print(str(objID))
         mntpts = drive_info.get('MountPoints')
         for letter in mntpts[0]:
             mount_point += chr(letter)
@@ -195,7 +193,7 @@ def mountPtsList(device):
             # print(str(mount_point))
             mntptsRt = str(mount_point[:-1])
             return mntptsRt
-    
+
 def mountPtsDIR(device):
     '''
     Method 2 - /media/ to get mount points
@@ -205,9 +203,9 @@ def mountPtsDIR(device):
     if device in mounted:
         mntptsRt = '/media/'+getpass.getuser()+'/'+device
         # print(mntptsRt)
-    
+
     return mntptsRt
-    
+
 def mountPtsOptical():
     '''
     Method 3 - /media/cdrom/ to get mount points
@@ -219,7 +217,7 @@ def mountPtsOptical():
         # print(mntptsRt)
 
     return mntptsRt
-            
+
 def userChoiceFT(theLST, elem):
     '''
     Prompt the user
@@ -239,9 +237,9 @@ def userChoiceFT(theLST, elem):
                 continue
         except Exception:
             continue
-    
+
     return userChoice
-    
+
 def choseDrive(theDict):
     '''
     Prompt user to chose a drive, return the drive chosen.
@@ -256,7 +254,7 @@ def choseDrive(theDict):
         except Exception:#python3
             print(str(i) + ' - ' + str(drives))
             lstKeys.append(i)
-            i +=1
+            i += 1
     userChoice = userChoiceFT(lstKeys, 'drive')
     try:#python2
         print('\nYou chose the drive ' + theDict.keys()[userChoice])
@@ -264,22 +262,22 @@ def choseDrive(theDict):
     except Exception:#python3
         print('\nYou chose the drive ' + list(theDict.keys())[userChoice])
         return list(theDict.keys())[userChoice]
-   
+
 def choseDevice(theDict, theDrive):
     '''
     If multiple devices, prompt the user to chose one, return the device chosen
     '''
-    allDevices = {} 
+    allDevices = {}
     for key, values in theDict[theDrive].items():
         # print(key, values)
-        if 'devices' == key:
+        if key == 'devices':
             # print(len(values))
             i = 0
             for deviceKey, deviceValues in values.items():
                 # print(deviceValues)
                 allDevices[i] = deviceValues
-                i +=1
-                        
+                i += 1
+
     tempDict = {}
     tempDict = allDevices #by default => one device
     if len(allDevices) > 1:#more than one device on the drive
@@ -293,8 +291,8 @@ def choseDevice(theDict, theDrive):
             except Exception:#python3
                 print(str(i) + ' - ' + values['label'])
                 lstDevices.append(i)
-                i +=1
-                
+                i += 1
+
         userChoice = userChoiceFT(lstDevices, 'device')
         #Get infos of the device (label, read-only and mountpoint)
         tempDict = {}
@@ -302,35 +300,42 @@ def choseDevice(theDict, theDrive):
     # print(tempDict)
 
     return tempDict
-    
+
 def getFiles(media):
     '''
     Get files of the device selected, return filesLst
     '''
     deviceFiles = []
-    # for dir, subdir, files in os.walk(unicode(media, 'utf-8')):
-    for dir, subdir, files in os.walk(media):
-        # print(dir, subdir, files)
+    # for rootDir, subdir, files in os.walk(unicode(media, 'utf-8')):
+    for rootDir, subdir, files in os.walk(media):
+        # print(rootDir, subdir, files)
         for filename in files:
-            # print(dir)
-            if 'System Volume Information' not in dir:
-                # print(os.path.join(dir, filename))
-                deviceFiles.append(os.path.join(dir, filename))
+            # print(rootDir)
+            if 'System Volume Information' not in rootDir:
+                # print(os.path.join(rootDir, filename))
+                deviceFiles.append(os.path.join(rootDir, filename))
     return deviceFiles
 
 def depackedDeviceDict(deviceDict):
+    '''
+    Return label, mountpoint and readonly state of a device dictionnary passed in parameter
+    '''
     for k, values in deviceDict.items():
         label = values['label']
         mountpoint = values['mountPts']
         readonly = values['readOnly']
-           
+
     # print(label)
     # print(mountpoint)
-    # print(readonly) 
-    
+    # print(readonly)
+
     return label, mountpoint, readonly
-        
+
 def init():
+    '''
+    Init the process of finding (and choosing) devices to scan,
+    Return the device chosen (automaticly if one device found) and its informations dict
+    '''
     #Get all detected drives
     objDict = deviceInfo()
 
@@ -348,23 +353,22 @@ def init():
             # print('one drive : '+chosen[0])
     else:
         return 0, 0
-     
+
     #Get devices of the drive selected
     try:
         deviceDict = choseDevice(objDict, chosen)#python2
     except Exception:
         deviceDict = choseDevice(objDict, chosen[0]) #python3
-    
-    return chosen, deviceDict
-    
-if __name__ == '__main__':
-   deviceDict = init()
-   print('You selected ', deviceDict)
 
-''' sources
-https://linuxmeerkat.wordpress.com/2014/11/12/python-detection-of-usb-storage-device/
-https://stackoverflow.com/questions/22615750/how-can-the-directory-of-a-usb-drive-connected-to-a-system-be-obtained
-https://stackoverflow.com/questions/23244245/listing-details-of-usb-drives-using-python-and-udisk2#
-http://storaged.org/doc/udisks2-api/latest/gdbus-org.freedesktop.UDisks2.Block.html
-https://www.programcreek.com/python/example/99877/uuid.uuid3 (exemple 38)
-'''
+    return chosen, deviceDict
+
+if __name__ == '__main__':
+    deviceDict = init()
+    print('You selected ', deviceDict)
+
+#sources
+# https://linuxmeerkat.wordpress.com/2014/11/12/python-detection-of-usb-storage-device/
+# https://stackoverflow.com/questions/22615750/how-can-the-directory-of-a-usb-drive-connected-to-a-system-be-obtained
+# https://stackoverflow.com/questions/23244245/listing-details-of-usb-drives-using-python-and-udisk2#
+# http://storaged.org/doc/udisks2-api/latest/gdbus-org.freedesktop.UDisks2.Block.html
+# https://www.programcreek.com/python/example/99877/uuid.uuid3 (exemple 38)

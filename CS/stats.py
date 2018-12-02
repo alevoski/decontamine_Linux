@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - stats.py
-#@Alexandre Buissé - 2018
+#@Alexandre BuissÃ© - 2018
 
-import commontools
+#Standard imports
 import os
+
+#Project modules imports
+from commontools import extractNumber
 
 def stat(fileLogs):
     '''
@@ -38,18 +41,18 @@ def globalStat(files):
     '''
     nbVirusDetect = 0
     nbVirusDel = 0
-    
-    f = open(files, 'r', encoding = 'utf-8')
+
+    f = open(files, 'r', encoding='utf-8')
     for line in f:
         # print(line)
         if "Nb virus found" in line:
-            nbVirusDetect = commontools.extractNumber(line)
+            nbVirusDetect = extractNumber(line)
             # print(str(files)+' nbVirusDetect:'+str(nbVirusDetect))
         if "Nb virus removed" in line:
-            nbVirusDel = commontools.extractNumber(line)
+            nbVirusDel = extractNumber(line)
             # print(str(files)+' nbVirusDel:'+str(nbVirusDel))
     return nbVirusDetect, nbVirusDel
-   
+
 def cleanLog(logDir):
     '''Clean the log directory'''
     for root, dirnames, filenames in os.walk(logDir + 'LOGS/'):
@@ -79,6 +82,6 @@ def cleanLog(logDir):
                     os.rmdir(subdirpath)
                 except Exception:
                     pass
-                    
+
 if __name__ == '__main__':
     nbScan, virusdetected, virusremoved = stat('/home/decontamine/')

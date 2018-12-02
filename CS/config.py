@@ -3,25 +3,29 @@
 #Decontamine Linux - config.py
 #@Alexandre Buissé - 2018
 
-import logManagement
-from commontools import import_from
+#Standard imports
 import os
 import sys
 from datetime import datetime
 import subprocess
-from termcolor import colored
 import getch
+from termcolor import colored
+
+#Project modules imports
+from logManagement import extractSTR
+from commontools import import_from
+
 
 avcompatibleDict = {'ClamAV':'clamdscan',
-'Sophos':'savscan',
-'F-Secure':'fsav'}
-modulescompatibleDict = {}
+                    'Sophos':'savscan',
+                    'F-Secure':'fsav'}
+# modulescompatibleDict = {}
 
 def init():
     '''
-    Verify 
+    Verify
         if av or scanning modules are present on the system
-            if the conf file exist (decontamine.cfg) it return the dict of av and modules activated, 
+            if the conf file exist (decontamine.cfg) it return the dict of av and modules activated,
             else it creates it with all activated by default
         else exit the program
     '''
@@ -46,7 +50,7 @@ def init():
             line2 = colored('activate', 'red', attrs=['bold', 'reverse'])
             line3 = colored(' one !', 'red', attrs=['bold'])
             print(line1 + line2 + line3)
-            rep = configurator(avcompatibleDict)  
+            rep = configurator(avcompatibleDict)
             return rep
     else:
         #no av or scanning modules present on the system
@@ -55,7 +59,7 @@ def init():
         line3 = colored(' one !', 'red', attrs=['bold'])
         print(line1 + line2 + line3)
         sys.exit(-1)
-        
+
 def finder(dictElem, option):
     '''
     Search antivirus and scanning modules on the system and return the find one
@@ -65,16 +69,16 @@ def finder(dictElem, option):
         for k, v in dictElem.items():
             try:
                 cmdline = 'command -v ' + v
-                p = subprocess.check_output(cmdline, shell = True)
+                p = subprocess.check_output(cmdline, shell=True)
                 # print(p)
                 # rep = 1
                 elemFind.append(k)
             except Exception:
                 # rep = 0
                 pass
-            # print(k + ' : ' + str(rep)) 
+            # print(k + ' : ' + str(rep))
     return elemFind
-    
+
 def getVersion(elem):
     '''
     Return cleaning tool version passed in parameter
@@ -84,7 +88,7 @@ def getVersion(elem):
     tocall = import_from(toolPath, tool)
     itemVersion = tocall.version()
     return itemVersion
-        
+
 def confUpdate(filename):
     '''
     Determine if the conf file must be update
@@ -101,76 +105,72 @@ def confUpdate(filename):
         return 1
     else:
         return 0
-        
+
 def getConfInfos(cfgFile):
     '''
     Get av and scanning modules activated and return them
     '''
-    f = open(cfgFile,'r')
+    f = open(cfgFile, 'r')
     tempFile = []
     tempFile = f.readlines()
     f.close()
     toolsDict = {}
     toolLSTDisabled = []
-    
     toupdate = confUpdate(cfgFile)
 
     for i, line in enumerate(tempFile):
         # print(line)
         if 'active = 1' in line:
-            toolTemp = tempFile[i-1]
-            tool = logManagement.extractSTR(tempFile[i-1], 'name = ')
-            if toupdate == 1:#get tool version and update file 
+            tool = extractSTR(tempFile[i-1], 'name = ')
+            if toupdate == 1:#get tool version and update file
                 version = str(getVersion(tool))
                 #update version
                 # sed -i '/ClamAV/{n;n;s/.*/version = 0.8/}' /home/decontamine/decontamine.cfg
-                os.system("sed -i '/" + tool + "/{n;n;s/.*/version = " + str(version).replace('/','\/') + "/}' " + cfgFile)
+                os.system("sed -i '/" + tool + "/{n;n;s/.*/version = " + str(version).replace('/', '\/') + "/}' " + cfgFile)
             else:
-                version = logManagement.extractSTR(tempFile[i+1], 'version = ')
+                version = extractSTR(tempFile[i+1], 'version = ')
             toolsDict[tool] = str(version)
         if 'active = 0' in line:
-            toolTemp = tempFile[i-1]
-            tool = logManagement.extractSTR(tempFile[i-1], 'name = ')
-            tool.replace('\n','')
-            toolLSTDisabled.append(tool.replace('\n',''))
-        
+            tool = extractSTR(tempFile[i-1], 'name = ')
+            tool.replace('\n', '')
+            toolLSTDisabled.append(tool.replace('\n', ''))
+
     return toolsDict, toolLSTDisabled
-    
+
 def setConfInfos(cfgFile, presentTools):
     '''
     Create the conf file and activated all av and scanning modules present on the system
     Return all of them
     '''
-    f = open(cfgFile,'w')
+    f = open(cfgFile, 'w')
     f.close()
-    
     toolsDict = {}
 
     for tool in presentTools:
         name = 'name = ' + str(tool)
-        actif =  'active = 1'
+        actif = 'active = 1'
         versionTemp = getVersion(tool)
         version = 'version = '+ str(versionTemp)
         f = open(cfgFile, "a", encoding="utf-8", errors='ignore')
-        f.write('##\n'+name+"\n"+actif+"\n"+version+"\n")    
+        f.write('##\n'+name+"\n"+actif+"\n"+version+"\n")
         f.close()
         toolsDict[tool] = str(versionTemp)
-        
+
     return toolsDict
-    
+
 def configurator(avcompatibleDict):
     '''
     Configure the cleaning station
     '''
-    folder = "/home/decontamine/" 
+    folder = "/home/decontamine/"
     filepath = folder+"decontamine.cfg"
-    filepath2 = folder+"lstMODdecontamine.cfg"
+    # filepath2 = folder+"lstMODdecontamine.cfg"
     # os.system('clear')
     limit = '_'*35
     # screen = terminal.get_terminal(conEmu=False)
-    
+
     if os.path.isfile(filepath):
-        
+
         # f = open(filepath,'w')
         # f.close()
         # print(lstAvTrouve)
@@ -182,11 +182,11 @@ def configurator(avcompatibleDict):
         print(colored("\n3 - Disable antivirus", 'blue', 'on_white'))
         print(colored("\n4 - Reset antivirus configuration", 'red', 'on_white'))
         # if os.path.isfile(filepath2):
-            # screen.cprint(8,0,"\n************Modules************")
-            # screen.cprint(8,0,"\n5 - Liste des modules développés")
-            # screen.cprint(8,0,"\n6 - Activer des modules")
-            # screen.cprint(8,0,"\n7 - Désactiver des modules")
-            # screen.cprint(8,0,"\n8 - Reset de la configuration des modules")
+            # screen.cprint(8, 0, "\n************Modules************")
+            # screen.cprint(8, 0, "\n5 - Liste des modules développés")
+            # screen.cprint(8, 0, "\n6 - Activer des modules")
+            # screen.cprint(8, 0, "\n7 - Désactiver des modules")
+            # screen.cprint(8, 0, "\n8 - Reset de la configuration des modules")
         print(colored("\n\ne - Exit\n", 'yellow', 'on_white'))
 
         while True:
@@ -195,44 +195,44 @@ def configurator(avcompatibleDict):
             if '1' in str(rep):
                 #Compatible AV
                 print(colored('\nCompatible antivirus \n', 'blue', 'on_white'))
-                for key, av in avcompatibleDict.items():      
+                for key, av in avcompatibleDict.items():
                     print(key)
             elif '2' in str(rep):
-                activationQuestion(disabledTools, 'activated', 'activate', '\nActivate antivirus \n', 'antivirus', filepath)            
+                activationQuestion(disabledTools, 'activated', 'activate', '\nActivate antivirus \n', 'antivirus', filepath)
             elif '3' in str(rep):
                 activationQuestion(activeTools, 'disabled', 'disable', '\nDisable antivirus \n', 'antivirus', filepath)
             elif '4' in str(rep):
                 os.remove(filepath)
                 return -1
-            if os.path.isfile(filepath2):
-                activeToolsMod, disabledToolsMod = configReader(filepath2, 'module_name = ', 3)
-                if '5' in str(rep):
+            # if os.path.isfile(filepath2):
+                # activeToolsMod, disabledToolsMod = configReader(filepath2, 'module_name = ', 3)
+                # if '5' in str(rep):
                     #Liste des modules développés
-                    screen.cprint(7,0, '\nModules développés \n')
-                    for key, mod in dictMOD.items():      
-                        screen.cprint(8,0, key+'\n')  
-                elif '6' in str(rep):
-                    desactiverMod = activationQuestion(disabledToolsMod, 'activés', 'activer', '\nActiver des modules \n', 'modules')            
+                    # screen.cprint(7, 0, '\nModules développés \n')
+                    # for key, mod in dictMOD.items():
+                        # screen.cprint(8, 0, key+'\n')
+                # elif '6' in str(rep):
+                    # desactiverMod = activationQuestion(disabledToolsMod, 'activés', 'activer', '\nActiver des modules \n', 'modules')
                     # res = activationExec(desactiverMod, 1, 'activé', filepath2, 'module_name = ')
-                elif '7' in str(rep):
-                    activerMod = activationQuestion(activeToolsMod, 'désactivés', 'désactiver', '\nDésactiver des modules \n', 'modules')
+                # elif '7' in str(rep):
+                    # activerMod = activationQuestion(activeToolsMod, 'désactivés', 'désactiver', '\nDésactiver des modules \n', 'modules')
                     # res = activationExec(activerMod, 0, 'désactivé', filepath2, 'module_name = ')
-                elif '8' in str(rep):
-                    os.remove(filepath2)
-                    return False
+                # elif '8' in str(rep):
+                    # os.remove(filepath2)
+                    # return False
             if 'e' in str(rep):
                 return False
             print(limit)
     else:
         return False
-    
+
 def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath):
     '''
     Configuration mode - enable/disable av and modules
     Take av and modules list and things to be printed.
     Ask question for each tools in the list.
     Sed the file to mod tool state if user wants to.
-    ''' 
+    '''
     if len(disabledToolsLST) > 0:
         print(colored(affichage, 'blue', 'on_white'))
         for tool in disabledToolsLST:
@@ -247,7 +247,7 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath)
                         version = str(getVersion(tool))
                         #update version
                         # sed -i '/ClamAV/{n;n;s/.*/version = 0.8/}' /home/decontamine/decontamine.cfg
-                        os.system("sed -i '/" + tool + "/{n;n;s/.*/version = " + str(version).replace('/','\/') + "/}' " + filepath)
+                        os.system("sed -i '/" + tool + "/{n;n;s/.*/version = " + str(version).replace('/', '\/') + "/}' " + filepath)
                         toMod = 1
                     # sed -i '/ClamAV/{n;s/.*/active = 0/}' /home/decontamine/decontamine.cfg
                     os.system("sed -i '/" + tool + "/{n;s/.*/active = " + str(toMod) + "/}' " + filepath)
@@ -258,7 +258,7 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath)
                     break
     else:
         print("All the " + elem + " are " + etat)
-        
+
 if __name__ == '__main__':
     res = init()
     print('scanners :', res)
@@ -267,5 +267,3 @@ if __name__ == '__main__':
         # res = init()
         # print(res)
     # print(confUpdate("/home/decontamine/decontamine.cfg"))
-        
-    

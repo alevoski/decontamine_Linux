@@ -1,36 +1,38 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - sophos.py
-#@Alexandre Buissé - 2018
+#@Alexandre BuissÃ© - 2018
 
-import commontools
-import logManagement
+#Standard imports
 import subprocess
 import re
+
+#Project modules imports
+from logManagement import writeLog, deleter
 
 def init(mountPts, readOnly, logDirectory):
     '''
     Init scan with Sophos
     '''
     logFile = logDirectory + 'tempSophosAV'
-    logManagement.writeLog(logFile, '\n*****Scan with Sophos - begin*****\n', 'utf-8')
+    writeLog(logFile, '\n*****Scan with Sophos - begin*****\n', 'utf-8')
     res = scan(mountPts, readOnly, logFile)
-    logManagement.writeLog(logFile, '\n*****Scan with Sophos - finish*****\n', 'utf-8')
-    
+    writeLog(logFile, '\n*****Scan with Sophos - finish*****\n', 'utf-8')
+
     # Clean the log of not usefull informations
-    logManagement.deleter(logFile, 'Using IDE file')
-    
+    deleter(logFile, 'Using IDE file')
+
     if res == 3:
         virusDict = getVirus(logFile)
         # print(virusDict)
         return virusDict, logFile
     return res, logFile
-    
+
 def getVirus(logFile):
     '''
-    Get virus dict 
+    Get virus dict
     '''
-    f = open(logFile, mode = 'r', encoding = 'utf-8')
+    f = open(logFile, mode='r', encoding='utf-8')
     virusFound = {}
     virusTEMP = {}
     virusName = ''
@@ -47,7 +49,7 @@ def getVirus(logFile):
             # removedVirus = re.findall('file (.*)', str(line))
             # print(removedVirus)
             lstRemoved.append(virusName[0])
-            
+
     #Compare lstRemoved with virusTEMP:
     # print('Sophos - virus detected\n')
     # print(virusTEMP)
@@ -65,7 +67,7 @@ def getVirus(logFile):
 def scan(mountPts, readOnly, logFile):
     '''
     Scan the mounting point in parameters.
-    Return 
+    Return
         a code
             0 : No virus and no errors
             1 : Scan interruption
@@ -73,17 +75,17 @@ def scan(mountPts, readOnly, logFile):
             3 : Virus found
     '''
     cmdline = 'savscan -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
-    if readOnly == False:
+    if not readOnly:
         cmdline = 'savscan -remove -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
     print('Scan begin')
     try:
-        res = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
+        res = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
         # print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
     except subprocess.CalledProcessError as e:#Error
         # print(e)
-        p = re.findall('exit status.*?(\d+)', str(e))
+        p = re.findall(r'exit status.*?(\d+)', str(e))
         # print(p)
         # print(int(p[0]))
         # print(type(p[0]))
@@ -96,14 +98,14 @@ def version():
     '''
     # cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Released"'
     cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Data file date"'
-    vertemp = str(subprocess.check_output(cmdline, shell = True), 'utf-8').splitlines()
-    
+    vertemp = str(subprocess.check_output(cmdline, shell=True), 'utf-8').splitlines()
+
     finalrestemp = ""
-    dictelemToreplace = {'Product version':'Prod_ver', 
-    'Engine version':'/Eng_ver',
-    'Virus data version':'/VirusDAT_ver',
-    'Data file date':'/'}
-    
+    dictelemToreplace = {'Product version':'Prod_ver',
+                         'Engine version':'/Eng_ver',
+                         'Virus data version':'/VirusDAT_ver',
+                         'Data file date':'/'}
+
     for elem in vertemp:
         for k, v in dictelemToreplace.items():
             if k in elem:
@@ -113,9 +115,9 @@ def version():
                     lastDatetemp = elem.replace(k, v) #we only want last date in result
     lastDate = re.findall(':(.*)', lastDatetemp)[0]
     # print(lastDate)
-    finalres = " ".join(finalrestemp.replace(':','').split()) + '/' + lastDate
+    finalres = " ".join(finalrestemp.replace(':', '').split()) + '/' + lastDate
     # print(finalres)
     return finalres
-    
+
 if __name__ == '__main__':
     version()

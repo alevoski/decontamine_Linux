@@ -1,36 +1,36 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - f-secure.py
-#@Alexandre Buissé - 2018
+#@Alexandre BuissÃ© - 2018
 
-import commontools
-import logManagement
+#Standard imports
 import subprocess
 import re
+
+#Project modules imports
+from commontools import prompter
+from logManagement import writeLog
 
 def init(mountPts, readOnly, logDirectory):
     '''
     Init scan with F-Secure
     '''
     logFile = logDirectory + 'tempF-SecureAV'
-    logManagement.writeLog(logFile, '\n*****Scan with F-Secure - begin*****\n', 'utf-8')
+    writeLog(logFile, '\n*****Scan with F-Secure - begin*****\n', 'utf-8')
     res = scan(mountPts, readOnly, logFile)
-    logManagement.writeLog(logFile, '\n*****Scan with F-Secure - finish*****\n', 'utf-8')
-    
-    # Clean the log of not usefull informations
-    # logManagement.deleter(logFile, 'Using IDE file')
-    
+    writeLog(logFile, '\n*****Scan with F-Secure - finish*****\n', 'utf-8')
+
     if res == 3 or res == 4 or res == 6 or res == 8:
         virusDict = getVirus(logFile)
         # print(virusDict)
         return virusDict, logFile
     return res, logFile
-    
+
 def getVirus(logFile):
     '''
-    Get virus dict 
+    Get virus dict
     '''
-    f = open(logFile, mode = 'r', encoding = 'utf-8')
+    f = open(logFile, mode='r', encoding='utf-8')
     virusFound = {}
     virusTEMP = {}
     virusName = ''
@@ -47,7 +47,7 @@ def getVirus(logFile):
             # removedVirus = re.findall('file (.*)', str(line))
             # print(removedVirus)
             lstRemoved.append(virusName[0])
-            
+
     #Compare lstRemoved with virusTEMP:
     # print('F-Secure - virus detected\n')
     # print(virusTEMP)
@@ -82,20 +82,20 @@ def scan(mountPts, readOnly, logFile):
         Program was terminated by pressing CTRL-C, or by a sigterm or suspend event.
     '''
     cmdline = 'fsav --virus-action1=report --allfiles --archive --maxnested=15 --scantimeout=180 ' + mountPts + ' >> ' + logFile
-    if readOnly == False:
+    if not readOnly:
         #Ask user if he wants av to autoclean the device
-        rep = commontools.prompter('Do you want to automaticly clean the device ? (y/n)')
+        rep = prompter('Do you want to automaticly clean the device ? (y/n)')
         if 'y' in str(rep):
             cmdline = 'fsav --virus-action1=clean --virus-action2=remove --auto --allfiles --archive --maxnested=15 --scantimeout=180 ' + mountPts + ' >> ' + logFile
     print('Scan begin')
     try:
-        res = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
+        res = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
         # print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
     except subprocess.CalledProcessError as e:#Error
         # print(e)
-        p = re.findall('exit status.*?(\d+)', str(e))
+        p = re.findall(r'exit status.*?(\d+)', str(e))
         # print(p)
         # print(int(p[0]))
         # print(type(p[0]))
@@ -107,21 +107,21 @@ def version():
     Return version informations of F-Secure
     '''
     cmdline = 'fsav --version | grep -e "Security version" -e "Hydra engine version" -e "Hydra database version"'
-    vertemp = str(subprocess.check_output(cmdline, shell = True), 'utf-8').splitlines()
-    
+    vertemp = str(subprocess.check_output(cmdline, shell=True), 'utf-8').splitlines()
+
     finalrestemp = ""
-    dictelemToreplace = {'F-Secure Linux Security version':'Prod_ver', 
-    'F-Secure Corporation Hydra engine version':'/Eng_ver',
-    'F-Secure Corporation Hydra database version ':'/'}
-    
+    dictelemToreplace = {'F-Secure Linux Security version':'Prod_ver',
+                         'F-Secure Corporation Hydra engine version':'/Eng_ver',
+                         'F-Secure Corporation Hydra database version ':'/'}
+
     for elem in vertemp:
         for k, v in dictelemToreplace.items():
             if k in elem:
                 finalrestemp = finalrestemp + elem.replace(k, v)
     # print(finalrestemp)
-    finalres = " ".join(finalrestemp.replace(':','').split())
+    finalres = " ".join(finalrestemp.replace(':', '').split())
     # print(finalres)
     return finalres
-    
+
 if __name__ == '__main__':
     version()

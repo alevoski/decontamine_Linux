@@ -3,13 +3,15 @@
 #Decontamine Linux - logManagement.py
 #@Alexandre Buissé - 2018
 
-import commontools
+#Standard imports
 import re
 import os
 import shutil
-import getch
 import subprocess
 import fileinput
+
+#Project modules imports
+from commontools import prompter
 
 def extractSTR(line, mystrRGX):
     '''Extract str'''
@@ -17,8 +19,8 @@ def extractSTR(line, mystrRGX):
     # mystrRGX = 'av_name = '#"([^"]+)"'
     temp = re.split(mystrRGX, line)[-1]
     # print(temp)
-    return temp.replace('\n','')
-    
+    return temp.replace('\n', '')
+
 def writeLog(logFile, element, codec):
     '''Write log on the station'''
     # print(repr(element))
@@ -33,9 +35,9 @@ def writeLog(logFile, element, codec):
         f.write(element)
         f.close()
     except Exception:
-        print("Can't write the file ",logFile, " with this element : " + str(element))
+        print("Can't write the file ", logFile, " with this element : " + str(element))
         pass
-        
+
 def writeFinalLog(concatenateBasesFiles, fileLst):
     '''
     Concatenate log files in one final log file
@@ -54,7 +56,7 @@ def writeFinalLog(concatenateBasesFiles, fileLst):
             except Exception:#OSError:
                 continue
     finalFile.close()
-    
+
 def concat(theFile, theList):
     '''
     Append a file to a list
@@ -65,22 +67,22 @@ def concat(theFile, theList):
     else:
         theList.append(theFile)
     return theList
-    
+
 def readLog(finalLog):
     '''
     Prompt the user to read the final log
     '''
-    rep = commontools.prompter('Do you want to read the detail of the scan ? (y/n)')
+    rep = prompter('Do you want to read the detail of the scan ? (y/n)')
     if 'y' in str(rep):
         subprocess.call(('xdg-open', str(finalLog)))
     elif 'n' in str(rep):
-        pass 
+        pass
 
 def getLog(finalLog, mountPTS):
     '''
     Prompt the user to get a copy of the final log
     '''
-    rep = commontools.prompter('Do you want a copy of the detail of the scan ? (y/n)')
+    rep = prompter('Do you want a copy of the detail of the scan ? (y/n)')
     if 'y' in str(rep):
         copiedFile = mountPTS + '/' + os.path.basename(finalLog)
         # print(finalLog)
@@ -89,8 +91,8 @@ def getLog(finalLog, mountPTS):
         if os.path.isfile(copiedFile):
             print('The result of the scan have been copied on the device ' + mountPTS)
     elif 'n' in str(rep):
-        pass 
-    
+        pass
+
 def replacer(logfile, elemOri, elem):
     '''Replace elemOri with elem in logfile'''
     f = open(logfile, 'r')
@@ -102,7 +104,7 @@ def replacer(logfile, elemOri, elem):
     f = open(logfile, 'w')
     f.write(newdata)
     f.close()
-    
+
 def deleter(logfile, elem):
     '''Delete line containing elem in logfile'''
     for line in fileinput.input(logfile, inplace=True):

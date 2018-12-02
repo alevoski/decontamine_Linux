@@ -1,32 +1,36 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - clamav.py
-#@Alexandre Buissé - 2018
+#@Alexandre BuissÃ© - 2018
 
-import commontools
-import logManagement
+#Standard imports
 import subprocess
 import re
+
+#Project modules imports
+from commontools import prompter
+from logManagement import writeLog
+
 
 def init(mountPts, readOnly, logDirectory):
     '''
     Init scan with ClamAV
     '''
     logFile = logDirectory + 'tempClamAV'
-    logManagement.writeLog(logFile, '\n*****Scan with ClamAV - begin*****\n', 'utf-8')
+    writeLog(logFile, '\n*****Scan with ClamAV - begin*****\n', 'utf-8')
     res = scan(mountPts, readOnly, logFile)
-    logManagement.writeLog(logFile, '\n*****Scan with ClamAV - finish*****\n', 'utf-8')
+    writeLog(logFile, '\n*****Scan with ClamAV - finish*****\n', 'utf-8')
     if res == 1:
         virusDict = getVirus(logFile)
         # print(virusDict)
         return virusDict, logFile
     return res, logFile
-    
+
 def getVirus(logFile):
     '''
-    Get virus dict 
+    Get virus dict
     '''
-    f = open(logFile, mode = 'r', encoding = 'utf-8')
+    f = open(logFile, mode='r', encoding='utf-8')
     virusFound = {}
     virusTEMP = {}
     virusName = ''
@@ -42,7 +46,7 @@ def getVirus(logFile):
             removedVirus = re.findall('(.*):', str(line))
             # print(removedVirus)
             lstRemoved.append(removedVirus[0])
-            
+
     #Compare lstRemoved with virusTEMP:
     # print(lstRemoved)
     for k, v in virusTEMP.items():
@@ -57,7 +61,7 @@ def getVirus(logFile):
 def scan(mountPts, readOnly, logFile):
     '''
     Scan the mounting point in parameters.
-    Return 
+    Return
         a code
             0 : No virus
             1 : Virus found
@@ -65,21 +69,21 @@ def scan(mountPts, readOnly, logFile):
             3 : Scan stopped by user
     '''
     cmdline = 'clamdscan -v -m --fdpass -l ' + logFile + ' ' + mountPts
-    if readOnly == False:
+    if not readOnly:
         #Ask user if he wants av to autoclean the device
-        rep = commontools.prompter('Do you want to automaticly clean the device ? (y/n)')
+        rep = prompter('Do you want to automaticly clean the device ? (y/n)')
         if 'y' in str(rep):
             cmdline = 'clamdscan -v -m --remove --fdpass -l ' + logFile + ' ' + mountPts
         elif 'n' in str(rep):
             pass
     print('Scan begin')
     try:
-        res = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
+        res = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
         # print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
     except subprocess.CalledProcessError as e:#Error
-        p = re.findall('exit status.*?(\d+)', str(e))
+        p = re.findall(r'exit status.*?(\d+)', str(e))
         # print(p)
         # print(int(p[0]))
         # print(type(p[0]))
@@ -91,8 +95,8 @@ def version():
     Return version number of ClamAV
     '''
     cmdline = 'clamdscan -V'
-    ver = str(subprocess.check_output(cmdline, shell = True), 'utf-8')
-    return ver.replace('ClamAV ','').replace('\n','')
-    
+    ver = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
+    return ver.replace('ClamAV ', '').replace('\n', '')
+
 if __name__ == '__main__':
     print(version())

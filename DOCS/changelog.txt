@@ -1,7 +1,21 @@
 CHANGELOG
 02/12/2018
     Put cleaning tools scripts in a separate subfolder
-
+    All modules have been converted in UTF-8 without BOM and in Unix (LF) format
+    Modules static analysis (# pylint3 --disable=invalid-name,line-too-long) + code cleaning
+        main.py                 8.79/10
+        analyze.py              8.77/10
+        config.py               8.70/10
+        commontools.py          8.57/10
+        logManagement.py        9.21/10
+        stats.py                9.39/10
+        kbhitClass.py           N/A
+        testPreAnalyse.py       8.55/10
+        tools_scripts/
+            clamav.py           7.82/10
+            f-secure.py         7.97/10
+            sophos.py           8.83/10
+    
 01/12/2018
     Version information
         Save cleaning tools version information into config file decontamine.cfg
