@@ -1,6 +1,9 @@
 CHANGELOG
+03/01/2018
+    Manage "EVALUATION PERIOD EXPIRED" in F-Secure module
+
 02/12/2018
-    Put cleaning tools scripts in a separate subfolder
+    Put cleaning tools scripts in a separate subfolder (tools-scripts)
     All modules have been converted in UTF-8 without BOM and in Unix (LF) format
     Modules static analysis (# pylint3 --disable=invalid-name,line-too-long) + code cleaning
         main.py                 8.79/10
@@ -23,7 +26,7 @@ CHANGELOG
             each n hours (set to 5)
             if a cleaning tool is enabled
             if the reset option is choose OR decontamine.cfg doesn't exist
-        It resolves the annoying wait times to get version information at each launch (ie ~10 secs for Sophos)
+        It resolves the annoying wait time to get version information at each launch (ie ~10 secs for Sophos)
 
 27/11/2018
     Better presentation of the printed sentences

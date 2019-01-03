@@ -106,22 +106,27 @@ def version():
     '''
     Return version informations of F-Secure
     '''
-    cmdline = 'fsav --version | grep -e "Security version" -e "Hydra engine version" -e "Hydra database version"'
-    vertemp = str(subprocess.check_output(cmdline, shell=True), 'utf-8').splitlines()
+    try:
+        cmdline = 'fsav --version | grep -e "Security version" -e "Hydra engine version" -e "Hydra database version"'
+        vertemp = str(subprocess.check_output(cmdline, shell=True), 'utf-8').splitlines()
 
-    finalrestemp = ""
-    dictelemToreplace = {'F-Secure Linux Security version':'Prod_ver',
-                         'F-Secure Corporation Hydra engine version':'/Eng_ver',
-                         'F-Secure Corporation Hydra database version ':'/'}
+        finalrestemp = ""
+        dictelemToreplace = {'F-Secure Linux Security version':'Prod_ver',
+                             'F-Secure Corporation Hydra engine version':'/Eng_ver',
+                             'F-Secure Corporation Hydra database version ':'/'}
 
-    for elem in vertemp:
-        for k, v in dictelemToreplace.items():
-            if k in elem:
-                finalrestemp = finalrestemp + elem.replace(k, v)
-    # print(finalrestemp)
-    finalres = " ".join(finalrestemp.replace(':', '').split())
-    # print(finalres)
-    return finalres
+        for elem in vertemp:
+            for k, v in dictelemToreplace.items():
+                if k in elem:
+                    finalrestemp = finalrestemp + elem.replace(k, v)
+        # print(finalrestemp)
+        finalres = " ".join(finalrestemp.replace(':', '').split())
+        # print(finalres)
+        return finalres
+    except subprocess.CalledProcessError as e:
+        # print(e)
+        return "Evaluation version"
+        
 
 if __name__ == '__main__':
     version()
