@@ -94,8 +94,7 @@ def version():
     '''
     Return version number of ClamAV
     '''
-    cmdline = 'clamdscan -V'
-    ver = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
+    ver = str(subprocess.check_output(['/usr/bin/clamdscan', '-V']), 'utf-8')
     return ver.replace('ClamAV ', '').replace('\n', '')
 
 if __name__ == '__main__':

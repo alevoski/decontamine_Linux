@@ -1,4 +1,15 @@
 CHANGELOG
+09/03/2019
+    Begin code corrections with bandit scanner
+        config module
+            Remove 2 system calls (3 left)
+            Remove a shell=True
+        main module
+            Remove 3 system calls
+            Replace os.system() by subprocess.call()
+        tools_scripts/clamav module
+            Remove a shell=True (1 left)
+
 03/01/2018
     Manage "EVALUATION PERIOD EXPIRED" in F-Secure module
 

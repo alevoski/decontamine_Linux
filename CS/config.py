@@ -45,7 +45,7 @@ def init():
             return scanners
         else:
             #no av or scanning modules activated on the system
-            os.system('clear')
+            print("\x1b[2J\x1b[H",end="") # clear
             line1 = colored('No antivirus or scanning modules activated on the system, please ', 'red', attrs=['bold'])
             line2 = colored('activate', 'red', attrs=['bold', 'reverse'])
             line3 = colored(' one !', 'red', attrs=['bold'])
@@ -67,16 +67,8 @@ def finder(dictElem, option):
     elemFind = []
     if option == 1:
         for k, v in dictElem.items():
-            try:
-                cmdline = 'command -v ' + v
-                p = subprocess.check_output(cmdline, shell=True)
-                # print(p)
-                # rep = 1
+            if subprocess.call(['/bin/which', v], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
                 elemFind.append(k)
-            except Exception:
-                # rep = 0
-                pass
-            # print(k + ' : ' + str(rep))
     return elemFind
 
 def getVersion(elem):
@@ -165,7 +157,7 @@ def configurator(avcompatibleDict):
     folder = "/home/decontamine/"
     filepath = folder+"decontamine.cfg"
     # filepath2 = folder+"lstMODdecontamine.cfg"
-    # os.system('clear')
+    # print("\x1b[2J\x1b[H",end="") # clear
     limit = '_'*35
     # screen = terminal.get_terminal(conEmu=False)
 

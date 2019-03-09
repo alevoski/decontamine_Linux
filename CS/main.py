@@ -7,6 +7,7 @@
 from datetime import datetime
 import time
 import os
+import subprocess
 import getch
 from termcolor import colored
 
@@ -27,11 +28,14 @@ logDirectory = '/home/decontamine/'
 
 def dismount(mountPTS):
     '''
-    Prompt the user to get a copy of the final log
+    Prompt the user to dismount and take back his device
     '''
     rep = commontools.prompter('Do you want to eject and get back your device ? (y/n)')
     if 'y' in str(rep):
-        os.system("umount "+str(mountPTS))
+        if subprocess.call(['/bin/umount', str(mountPTS)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+            print('Success to umount your device !')
+        else:
+            print('Cannot umount your device !')
         print('Tape a key to exit.')
         if getch.getch():
             pass
@@ -46,7 +50,7 @@ def init():
     #Clean log directory
     stats.cleanLog(logDirectory)
 
-    os.system('clear')
+    print("\x1b[2J\x1b[H",end="") # clear
     # colored('install', 'red', attrs=['bold', 'reverse'])
     projectName = 'Decontamine Linux'
     projectDescription = 'Analyzing and cleaning station:'
@@ -89,7 +93,7 @@ def init():
                 rep = getch.getch()
                 print(rep)
                 if 'c' in str(rep):#enter config mode
-                    os.system('clear')
+                    print("\x1b[2J\x1b[H",end="") # clear
                     rep = config.configurator(avcompatibleDict)
                     init()
             chosen, deviceDict = testPreAnalyse.init()
