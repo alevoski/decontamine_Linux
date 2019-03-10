@@ -68,25 +68,22 @@ def scan(mountPts, readOnly, logFile):
             2 : Error
             3 : Scan stopped by user
     '''
-    cmdline = 'clamdscan -v -m --fdpass -l ' + logFile + ' ' + mountPts
+    cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--fdpass', '-l', logFile, mountPts]
     if not readOnly:
         #Ask user if he wants av to autoclean the device
         rep = prompter('Do you want to automaticly clean the device ? (y/n)')
         if 'y' in str(rep):
-            cmdline = 'clamdscan -v -m --remove --fdpass -l ' + logFile + ' ' + mountPts
+            cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--remove', '--fdpass', '-l', logFile, mountPts]
         elif 'n' in str(rep):
             pass
     print('Scan begin')
     try:
-        res = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
-        # print(res)
+        res = str(subprocess.check_output(cmdline), 'utf-8')
+        #print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
     except subprocess.CalledProcessError as e:#Error
         p = re.findall(r'exit status.*?(\d+)', str(e))
-        # print(p)
-        # print(int(p[0]))
-        # print(type(p[0]))
 
     return int(p[0])
 

@@ -74,12 +74,12 @@ def scan(mountPts, readOnly, logFile):
             2 : Errors encounter
             3 : Virus found
     '''
-    cmdline = 'savscan -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
+    cmdline = ['/usr/local/bin/savscan', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', '--no-reset-atime', mountPts, '-p='+ logFile]
     if not readOnly:
-        cmdline = 'savscan -remove -f -all -rec -sc --stay-on-filesystem --stay-on-machine --backtrack-protection --preserve-backtrack --no-reset-atime --no-reset-atime ' + mountPts + ' >> ' + logFile
+        cmdline = ['/usr/local/bin/savscan', '-remove', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', '--no-reset-atime', mountPts, '-p=' + logFile]
     print('Scan begin')
     try:
-        res = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
+        res = str(subprocess.check_output(cmdline), 'utf-8')
         # print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
         return 0
