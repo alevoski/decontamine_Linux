@@ -97,25 +97,23 @@ def version():
     Return version informations of Sophos
     '''
     # cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Released"'
-    cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Data file date"'
-    vertemp = str(subprocess.check_output(cmdline, shell=True), 'utf-8').splitlines()
+    # cmdline = 'savscan -v | grep -e "Product version" -e "Engine version" -e "Virus data version" -e "Data file date"'
+    vertemp = str(subprocess.check_output(['/usr/local/bin/savscan', '-v']), 'utf-8')
 
-    finalrestemp = ""
-    dictelemToreplace = {'Product version':'Prod_ver',
-                         'Engine version':'/Eng_ver',
-                         'Virus data version':'/VirusDAT_ver',
-                         'Data file date':'/'}
+    # Get Product version
+    pver = 'Prod_ver ' + str(re.findall('Product version *: (.*)', vertemp)[0])
 
-    for elem in vertemp:
-        for k, v in dictelemToreplace.items():
-            if k in elem:
-                if 'Data file date' not in elem:
-                    finalrestemp = finalrestemp + elem.replace(k, v)
-                else: #'Data file date' in elem
-                    lastDatetemp = elem.replace(k, v) #we only want last date in result
-    lastDate = re.findall(':(.*)', lastDatetemp)[0]
-    # print(lastDate)
-    finalres = " ".join(finalrestemp.replace(':', '').split()) + '/' + lastDate
+    # Get Engine version
+    ever = '/Eng_ver ' + str(re.findall('Engine version *: (.*)', vertemp)[0])
+
+    # Get Virus data version
+    vdata = '/VirusDAT_ver ' + str(re.findall('Virus data version *: (.*)', vertemp)[0])
+
+    # Get Virus data version
+    vdate = '/ ' + str(re.findall('Data file date *: (.*)', vertemp)[-1])
+
+    finalres = pver + ever + vdata + vdate
+
     # print(finalres)
     return finalres
 

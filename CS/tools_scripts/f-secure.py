@@ -17,14 +17,12 @@ def init(mountPts, readOnly, logDirectory):
     '''
     logFile = logDirectory + 'tempF-SecureAV'
     writeLog(logFile, '\n*****Scan with F-Secure - begin*****\n', 'utf-8')
-    res = scan(mountPts, readOnly, logFile)
+    scan(mountPts, readOnly, logFile)
     writeLog(logFile, '\n*****Scan with F-Secure - finish*****\n', 'utf-8')
 
-    if res == 3 or res == 4 or res == 6 or res == 8:
-        virusDict = getVirus(logFile)
-        # print(virusDict)
-        return virusDict, logFile
-    return res, logFile
+    virusDict = getVirus(logFile)
+    # print(virusDict)
+    return virusDict, logFile
 
 def getVirus(logFile):
     '''
@@ -65,68 +63,42 @@ def getVirus(logFile):
 def scan(mountPts, readOnly, logFile):
     '''
     Scan the mounting point in parameters.
-    Return a code
-        0      Normal exit; no viruses or suspicious files found.
-        1      Fatal error; unrecoverable error.  (Usually a missing or corrupted file.)
-        3      A boot virus or file virus found.
-        4      Riskware (potential spyware) found.
-        6      At least one virus was removed and no infected files left.
-        7      Out of memory.
-        8      Suspicious files found; these are not necessarily infected by a virus.
-        9      Scan error, at least one file scan failed.
-        64 + return code above
-        Program was prematurely terminated by SIGIN after  something  abnormal  already
-        had been detected. Usually this means that the user pressed CTRL-C (64 means we
-        set the 7th bit to 1)
-        128 + signal number
-        Program was terminated by pressing CTRL-C, or by a sigterm or suspend event.
     '''
-    cmdline = 'fsav --virus-action1=report --allfiles --archive --maxnested=15 --scantimeout=180 ' + mountPts + ' >> ' + logFile
+    cmdline = ['/usr/bin/fsav', '--virus-action1=report', '--allfiles', '--archive', '--maxnested=15', '--scantimeout=180', mountPts]
     if not readOnly:
         #Ask user if he wants av to autoclean the device
         rep = prompter('Do you want to automaticly clean the device ? (y/n)')
         if 'y' in str(rep):
-            cmdline = 'fsav --virus-action1=clean --virus-action2=remove --auto --allfiles --archive --maxnested=15 --scantimeout=180 ' + mountPts + ' >> ' + logFile
+            cmdline = ['/usr/bin/fsav', '--virus-action1=clean', '--virus-action2=remove', '--auto', '--allfiles', '--archive', '--maxnested=15', '--scantimeout=180', mountPts]
     print('Scan begin')
-    try:
-        res = str(subprocess.check_output(cmdline, shell=True), 'utf-8')
-        # print(res)
-        # p = re.findall('Infected files:*?(\d+)', str(res))
-        return 0
-    except subprocess.CalledProcessError as e:#Error
-        # print(e)
-        p = re.findall(r'exit status.*?(\d+)', str(e))
-        # print(p)
-        # print(int(p[0]))
-        # print(type(p[0]))
-
-    return int(p[0])
+    with open(logFile, mode='w', encoding='utf-8') as flog:
+        subprocess.call(cmdline, stdout=flog)
 
 def version():
     '''
     Return version informations of F-Secure
     '''
     try:
-        cmdline = 'fsav --version | grep -e "Security version" -e "Hydra engine version" -e "Hydra database version"'
-        vertemp = str(subprocess.check_output(cmdline, shell=True), 'utf-8').splitlines()
+        # cmdline = 'fsav --version | grep -e "Security version" -e "Hydra engine version" -e "Hydra database version"'
+        vertemp = str(subprocess.check_output(['/usr/bin/fsav', '--version']), 'utf-8')
 
-        finalrestemp = ""
-        dictelemToreplace = {'F-Secure Linux Security version':'Prod_ver',
-                             'F-Secure Corporation Hydra engine version':'/Eng_ver',
-                             'F-Secure Corporation Hydra database version ':'/'}
+        # Get Product version
+        pver = 'Prod_ver ' + str(re.findall('F-Secure Linux Security version (.*)', vertemp)[0])
 
-        for elem in vertemp:
-            for k, v in dictelemToreplace.items():
-                if k in elem:
-                    finalrestemp = finalrestemp + elem.replace(k, v)
-        # print(finalrestemp)
-        finalres = " ".join(finalrestemp.replace(':', '').split())
+        # Get Engine version
+        ever = '/Eng_ver ' + str(re.findall('F-Secure Corporation Hydra engine version (.*)', vertemp)[0])
+
+        # Get last update date
+        vdata = '/VirusDAT_ver ' + str(re.findall('F-Secure Corporation Hydra database version (.*)', vertemp)[0])
+
+        finalres = pver + ever + vdata
+
         # print(finalres)
         return finalres
     except subprocess.CalledProcessError as e:
         # print(e)
         return "Evaluation version"
-        
+
 
 if __name__ == '__main__':
     version()

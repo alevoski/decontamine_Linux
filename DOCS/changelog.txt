@@ -1,4 +1,11 @@
 CHANGELOG
+17/03/2019
+    Continuing code correction with bandit scanner
+        tools_scripts/sophos module
+            Remove the last shell=True
+        tools_scripts/f-secure module
+            Remove 2 shell=True
+    
 09/03/2019 & 10/03/2019
     Begin code corrections with bandit scanner
         config module
@@ -9,7 +16,7 @@ CHANGELOG
             Replace os.system() by subprocess.call()
         tools_scripts/clamav module
             Remove 2 shell=True.
-        tools_scripts/clamav module
+        tools_scripts/sophos module
             Remove 1 shell=True (one left)
 
 03/01/2018
