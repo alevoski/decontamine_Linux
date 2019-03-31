@@ -42,15 +42,16 @@ def globalStat(files):
     nbVirusDetect = 0
     nbVirusDel = 0
 
-    f = open(files, 'r', encoding='utf-8')
-    for line in f:
-        # print(line)
-        if "Nb virus found" in line:
-            nbVirusDetect = extractNumber(line)
-            # print(str(files)+' nbVirusDetect:'+str(nbVirusDetect))
-        if "Nb virus removed" in line:
-            nbVirusDel = extractNumber(line)
-            # print(str(files)+' nbVirusDel:'+str(nbVirusDel))
+    # @Alex : f.close() cant be forgotten (https://docs.python.org/3/tutorial/errors.html - 8.7)
+    with open(files, 'r', encoding='utf-8') as f:
+        for line in f:
+            # print(line)
+            if "Nb virus found" in line:
+                nbVirusDetect = extractNumber(line)
+                # print(str(files)+' nbVirusDetect:'+str(nbVirusDetect))
+            if "Nb virus removed" in line:
+                nbVirusDel = extractNumber(line)
+                # print(str(files)+' nbVirusDel:'+str(nbVirusDel))
     return nbVirusDetect, nbVirusDel
 
 def cleanLog(logDir):

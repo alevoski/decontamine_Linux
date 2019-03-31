@@ -88,8 +88,9 @@ def prompter(toAsk):
     '''
     while True:
         print(toAsk)
-        rep = getch.getch()
-        if 'y' in str(rep) or 'n' in str(rep):
+        rep = str(getch.getch())
+#        if 'y' in str(rep) or 'n' in str(rep):
+        if rep in ['y', 'n']:
             break
     return rep
 
