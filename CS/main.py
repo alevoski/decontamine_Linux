@@ -47,6 +47,9 @@ def init():
     Initialization of the cleaning station
     It's the main function
     '''
+    # Check if to exit program.
+    exitStat = False
+
     #Clean log directory
     stats.cleanLog(logDirectory)
 
@@ -54,14 +57,16 @@ def init():
     # colored('install', 'red', attrs=['bold', 'reverse'])
     projectName = 'Decontamine Linux'
     projectDescription = 'Analyzing and cleaning station:'
-    compatibility = '   for optical drives, USB drives, etc.'
+    compatibility = '   for optical drives, USB drives, etc.\n'
     configPrint = 'Type "' + colored('C', 'red') + '" to enter the configurator'
+    exitPrint = 'Type "' + colored('E', 'red') + '" to exit program'
     print('*'*len(projectName) + 20*('*'))
     print('*'*10 + colored(projectName, attrs=['bold']) + 10*'*')
     print('*'*len(projectName) + 20*('*'))
     print(projectDescription)
     print(compatibility)
     print(configPrint)
+    print(exitPrint)
     now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
     print("\nBegin: {d}".format(d=now) + '\n')
 
@@ -90,14 +95,23 @@ def init():
         print('\nPlease insert a drive to analyze')
         while chosen == 0:
             if commontools.mykbhit():
-                rep = str(getch.getch())
-                print(rep)
+                rep = str(getch.getch())        # TODO: Some idle while wait for a key. Why ?
                 if rep in ['c', 'C']:     #enter config mode
                     print("\x1b[2J\x1b[H",end="") # clear
                     rep = config.configurator(avcompatibleDict)
                     init()
-            chosen, deviceDict = testPreAnalyse.init()
+
+                if rep in ['e', 'E']:
+                    exitStat = True
+
+            if exitStat:
+                break
+            else:
+                chosen, deviceDict = testPreAnalyse.init()
         # print(deviceDict)
+
+        if exitStat:    # TODO: change cause it's dirty !!
+            break
 
         #Get device attributs
         label, mountpoint, readonly = testPreAnalyse.depackedDeviceDict(deviceDict)
