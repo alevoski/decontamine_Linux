@@ -124,7 +124,7 @@ def init():
             print('\n' + '_'*30 + '\n')
             print('Device {} detected'.format(label))
             if readonly == 1:
-                print('\n {} is read-only, ' + colored('it will be impossible to remove viruses !', attrs=['bold']).format(label))
+                print('\n {} is read-only, '.format(label) + colored('it will be impossible to remove viruses !', attrs=['bold']))
 
             element1 = "-------------------------Device scanned : ''"+str(label)+"'' --------------\n"
             element1b = "-------------------------Read-only : "+str(readonly)+" --------------\n"

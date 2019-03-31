@@ -143,7 +143,7 @@ def setConfInfos(cfgFile, presentTools):
             name = 'name = {}'.format(tool)
             actif = 'active = 1'
             versionTemp = getVersion(tool)
-            version = 'version = {}'.fromat(versionTemp)
+            version = 'version = {}'.format(versionTemp)
             f.write("##\n" + name + "\n" + actif + "\n" + version + "\n")
             toolsDict[tool] = str(versionTemp)
 
@@ -227,7 +227,8 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath)
     if len(disabledToolsLST) > 0:
         print(colored(affichage, 'blue', 'on_white'))
         for tool in disabledToolsLST:
-            print("Do you want to {} " + colored(str(tool), 'grey', 'on_yellow') + " ? (y = yes, n = no)".format(actif))
+            print(actif)
+            print("Do you want to {} ".format(actif) + colored(str(tool), 'grey', 'on_yellow') + " ? (y = yes, n = no)")
             while True:
                 rep3 = str(getch.getch())
                 if rep3 in ['y', 'Y']:
