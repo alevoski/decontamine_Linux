@@ -56,8 +56,7 @@ sudo ./fsls-11.10.68-rtm/fsls-11.10.68 --command-line-only
 
 ### HOW TO USE ?
 ```
-cd CS/
-python3 main.py
+python3 decontamine_linux.py
 ```
 
 #### Demos  
@@ -77,11 +76,11 @@ python3 main.py
 For more information, please read the [documentation](https://github.com/alevoski/decontamine_Linux/tree/master/DOCS) in DOCS/ directory
 
 ## Author
-Alexandre Buissé
+Alexandre BuissÃ©
 
 ## License
 Decontamine_Linux. USB devices cleaning station.  
-Copyright (C) 2018 Alexandre Buissé alevoski@pm.me
+Copyright (C) 2018 Alexandre BuissÃ© alevoski@pm.me
 
 This program is free software: you can redistribute it and/or modify  
 it under the terms of the GNU Affero General Public License as published  
@@ -95,5 +94,3 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License  
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-
