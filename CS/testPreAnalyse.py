@@ -48,7 +48,7 @@ def deviceInfo():
             # print('driveTypeLen :', len(driveType))
             # print(str(k))
             # if len(driveType) != 0:#Do nothing if no driveType
-            if len(str(k)) != 0:#Do nothing if no driveType
+            if len(str(k)) != 0:    #Do nothing if no driveType
                 devices = devicesList(str(k), str(driveType), str(driveBus), str(ejectable))
                 # print('devices',devices)
                 if len(devices) > 0:
@@ -249,18 +249,18 @@ def choseDrive(theDict):
     i = 0
     for drives in theDict.keys():
         try:#python2
-            print(str(theDict.keys().index(drives)) + ' - ' + drives)
+            print('{} - {}'.format(theDict.keys().index(drives), drives))
             lstKeys.append(theDict.keys().index(drives))
         except Exception:#python3
-            print(str(i) + ' - ' + str(drives))
+            print('{} - {}'.format(i, drives))
             lstKeys.append(i)
             i += 1
     userChoice = userChoiceFT(lstKeys, 'drive')
     try:#python2
-        print('\nYou chose the drive ' + theDict.keys()[userChoice])
+        print('\nYou chose the drive {}'.format(theDict.keys()[userChoice]))
         return theDict.keys()[userChoice]
     except Exception:#python3
-        print('\nYou chose the drive ' + list(theDict.keys())[userChoice])
+        print('\nYou chose the drive {}'.format(list(theDict.keys())[userChoice]))
         return list(theDict.keys())[userChoice]
 
 def choseDevice(theDict, theDrive):
@@ -286,10 +286,10 @@ def choseDevice(theDict, theDrive):
         i = 0
         for k, values in allDevices.items():
             try:#python2
-                print(str(allDevices.keys().index(k)) + ' - ' + values['label'])
+                print('{} - {}'.format(allDevices.keys().index(k), values['label']))
                 lstDevices.append(allDevices.keys().index(k))
             except Exception:#python3
-                print(str(i) + ' - ' + values['label'])
+                print("{} - {}".format(i, values['label']))
                 lstDevices.append(i)
                 i += 1
 

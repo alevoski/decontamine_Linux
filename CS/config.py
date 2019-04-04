@@ -102,10 +102,11 @@ def getConfInfos(cfgFile):
     '''
     Get av and scanning modules activated and return them
     '''
-    f = open(cfgFile, 'r')
-    tempFile = []
-    tempFile = f.readlines()
-    f.close()
+    # @Alex : f.close() cant be forgotten (https://docs.python.org/3/tutorial/errors.html - 8.7)
+    #tempFile = []
+    with open(cfgFile, 'r') as f:
+        tempFile = f.readlines()
+
     toolsDict = {}
     toolLSTDisabled = []
     toupdate = confUpdate(cfgFile)
@@ -134,19 +135,17 @@ def setConfInfos(cfgFile, presentTools):
     Create the conf file and activated all av and scanning modules present on the system
     Return all of them
     '''
-    f = open(cfgFile, 'w')
-    f.close()
     toolsDict = {}
 
-    for tool in presentTools:
-        name = 'name = ' + str(tool)
-        actif = 'active = 1'
-        versionTemp = getVersion(tool)
-        version = 'version = '+ str(versionTemp)
-        f = open(cfgFile, "a", encoding="utf-8", errors='ignore')
-        f.write('##\n'+name+"\n"+actif+"\n"+version+"\n")
-        f.close()
-        toolsDict[tool] = str(versionTemp)
+    # @Alex : f.close() cant be forgotten (https://docs.python.org/3/tutorial/errors.html - 8.7)
+    with open(cfgFile, "w", encoding="utf-8", errors='ignore') as f:
+        for tool in presentTools:
+            name = 'name = {}'.format(tool)
+            actif = 'active = 1'
+            versionTemp = getVersion(tool)
+            version = 'version = {}'.format(versionTemp)
+            f.write("##\n" + name + "\n" + actif + "\n" + version + "\n")
+            toolsDict[tool] = str(versionTemp)
 
     return toolsDict
 
@@ -183,17 +182,17 @@ def configurator(avcompatibleDict):
 
         while True:
             activeTools, disabledTools = getConfInfos(filepath)
-            rep = getch.getch()
-            if '1' in str(rep):
+            rep = str(getch.getch())
+            if rep == '1':
                 #Compatible AV
                 print(colored('\nCompatible antivirus \n', 'blue', 'on_white'))
                 for key, av in avcompatibleDict.items():
                     print(key)
-            elif '2' in str(rep):
+            elif rep == '2':
                 activationQuestion(disabledTools, 'activated', 'activate', '\nActivate antivirus \n', 'antivirus', filepath)
-            elif '3' in str(rep):
+            elif rep == '3':
                 activationQuestion(activeTools, 'disabled', 'disable', '\nDisable antivirus \n', 'antivirus', filepath)
-            elif '4' in str(rep):
+            elif rep == '4':
                 os.remove(filepath)
                 return -1
             # if os.path.isfile(filepath2):
@@ -212,7 +211,7 @@ def configurator(avcompatibleDict):
                 # elif '8' in str(rep):
                     # os.remove(filepath2)
                     # return False
-            if 'e' in str(rep):
+            if rep in ["e", "E"]:
                 return False
             print(limit)
     else:
@@ -228,14 +227,15 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath)
     if len(disabledToolsLST) > 0:
         print(colored(affichage, 'blue', 'on_white'))
         for tool in disabledToolsLST:
-            print("Do you want to " + actif + ' ' + colored(str(tool), 'grey', 'on_yellow')+" ? (y = yes, n = no)")
+            print(actif)
+            print("Do you want to {} ".format(actif) + colored(str(tool), 'grey', 'on_yellow') + " ? (y = yes, n = no)")
             while True:
-                rep3 = getch.getch()
-                if 'y' in str(rep3):
+                rep3 = str(getch.getch())
+                if rep3 in ['y', 'Y']:
                     toMod = 0 #disable
                     if actif == 'activate':
                         #Get tool version
-                        print('Getting ' + tool + ' version information')
+                        print('Getting {} version information'.format(tool))
                         version = str(getVersion(tool))
                         #update version
                         # sed -i '/ClamAV/{n;n;s/.*/version = 0.8/}' /home/decontamine/decontamine.cfg
@@ -245,7 +245,7 @@ def activationQuestion(disabledToolsLST, etat, actif, affichage, elem, filepath)
                     os.system("sed -i '/" + tool + "/{n;s/.*/active = " + str(toMod) + "/}' " + filepath)
                     print(tool + ' is now ' + actif)
                     break
-                elif 'n' in str(rep3):
+                elif rep3 in ['n', 'N']:
                     # print(" unsave")
                     break
     else:

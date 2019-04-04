@@ -33,10 +33,11 @@ def writeLog(logFile, element, codec):
         f = open(logFile, 'a', encoding=codec, errors='ignore')
         # print(element)
         f.write(element)
-        f.close()
     except Exception:
-        print("Can't write the file ", logFile, " with this element : " + str(element))
-        pass
+        print("Can't write the file {} with this element : {}".format(logFile, element))
+    finally:
+        f.close()
+
 
 def writeFinalLog(concatenateBasesFiles, fileLst):
     '''
@@ -73,9 +74,9 @@ def readLog(finalLog):
     Prompt the user to read the final log
     '''
     rep = prompter('Do you want to read the detail of the scan ? (y/n)')
-    if 'y' in str(rep):
+    if rep == 'y':
         subprocess.call(('xdg-open', str(finalLog)))
-    elif 'n' in str(rep):
+    elif rep == 'n':
         pass
 
 def getLog(finalLog, mountPTS):
@@ -83,27 +84,25 @@ def getLog(finalLog, mountPTS):
     Prompt the user to get a copy of the final log
     '''
     rep = prompter('Do you want a copy of the detail of the scan ? (y/n)')
-    if 'y' in str(rep):
+    if rep == 'y':
         copiedFile = mountPTS + '/' + os.path.basename(finalLog)
         # print(finalLog)
         shutil.copy2(finalLog, copiedFile)
         # print(copiedFile)
         if os.path.isfile(copiedFile):
             print('The result of the scan have been copied on the device ' + mountPTS)
-    elif 'n' in str(rep):
+    elif rep == 'n':
         pass
 
 def replacer(logfile, elemOri, elem):
     '''Replace elemOri with elem in logfile'''
-    f = open(logfile, 'r')
-    filedata = f.read()
-    f.close()
+    with open(logfile, 'r') as f:
+        filedata = f.read()
 
     newdata = filedata.replace(elemOri, elem)
 
-    f = open(logfile, 'w')
-    f.write(newdata)
-    f.close()
+    with open(logfile, 'w') as f:
+        f.write(newdata)
 
 def deleter(logfile, elem):
     '''Delete line containing elem in logfile'''

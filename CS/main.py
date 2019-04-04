@@ -31,7 +31,7 @@ def dismount(mountPTS):
     Prompt the user to dismount and take back his device
     '''
     rep = commontools.prompter('Do you want to eject and get back your device ? (y/n)')
-    if 'y' in str(rep):
+    if rep in ['y', 'Y']:
         if subprocess.call(['/bin/umount', str(mountPTS)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
             print('Success to umount your device !')
         else:
@@ -39,7 +39,7 @@ def dismount(mountPTS):
         print('Tape a key to exit.')
         if getch.getch():
             pass
-    elif 'n' in str(rep):
+    elif rep in ['n', 'N']:
         pass
 
 def init():
@@ -47,6 +47,9 @@ def init():
     Initialization of the cleaning station
     It's the main function
     '''
+    # Check if to exit program.
+    exitStat = False
+
     #Clean log directory
     stats.cleanLog(logDirectory)
 
@@ -54,14 +57,16 @@ def init():
     # colored('install', 'red', attrs=['bold', 'reverse'])
     projectName = 'Decontamine Linux'
     projectDescription = 'Analyzing and cleaning station:'
-    compatibility = '   for optical drives, USB drives, etc.'
+    compatibility = '   for optical drives, USB drives, etc.\n'
     configPrint = 'Type "' + colored('C', 'red') + '" to enter the configurator'
+    exitPrint = 'Type "' + colored('E', 'red') + '" to exit program'
     print('*'*len(projectName) + 20*('*'))
     print('*'*10 + colored(projectName, attrs=['bold']) + 10*'*')
     print('*'*len(projectName) + 20*('*'))
     print(projectDescription)
     print(compatibility)
     print(configPrint)
+    print(exitPrint)
     now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
     print("\nBegin: {d}".format(d=now) + '\n')
 
@@ -90,26 +95,36 @@ def init():
         print('\nPlease insert a drive to analyze')
         while chosen == 0:
             if commontools.mykbhit():
-                rep = getch.getch()
-                print(rep)
-                if 'c' in str(rep):#enter config mode
+                rep = str(getch.getch())        # TODO: Some idle while wait for a key. Why ?
+                if rep in ['c', 'C']:     #enter config mode
                     print("\x1b[2J\x1b[H",end="") # clear
                     rep = config.configurator(avcompatibleDict)
                     init()
-            chosen, deviceDict = testPreAnalyse.init()
+
+                if rep in ['e', 'E']:
+                    exitStat = True
+
+            if exitStat:
+                break
+            else:
+                chosen, deviceDict = testPreAnalyse.init()
         # print(deviceDict)
+
+        if exitStat:    # TODO: change cause it's dirty !!
+            break
 
         #Get device attributs
         label, mountpoint, readonly = testPreAnalyse.depackedDeviceDict(deviceDict)
 
         if mountpoint != '':
-            logFilePath1 = logDirectory + 'LOGS/' + str(datetime.now().strftime('%Y/%m/%d')) + '/' + datetime.now().strftime("%d%m%y%H%M%S")
+            logFilePath1 = logDirectory + 'LOGS/{}'.format(datetime.now().strftime('%Y/%m/%d'))
+            logFilePath1 += '/' + datetime.now().strftime("%d%m%y%H%M%S")
             logFilePath = logFilePath1+"Log.txt"
 
             print('\n' + '_'*30 + '\n')
-            print('Device ' + label + ' detected')
+            print('Device {} detected'.format(label))
             if readonly == 1:
-                print('\n' + label + ' is read-only, ' + colored('it will be impossible to remove viruses !', attrs=['bold']))
+                print('\n {} is read-only, '.format(label) + colored('it will be impossible to remove viruses !', attrs=['bold']))
 
             element1 = "-------------------------Device scanned : ''"+str(label)+"'' --------------\n"
             element1b = "-------------------------Read-only : "+str(readonly)+" --------------\n"
@@ -125,15 +140,15 @@ def init():
                 filesLst = testPreAnalyse.getFiles(mountpoint)
                 if len(filesLst) > 0:
                     # print(filesLst)
-                    filePrint = str(len(filesLst)) + ' files to analyze on the device "' + label + '"'
-                    print(colored(str(len(filesLst)), 'yellow') + ' files to analyze on the device "' + label + '"')
+                    filePrint = '{} files to analyze on the device "{}"'.format(len(filesLst), label)
+                    print(colored(str(len(filesLst)), 'yellow') + ' files to analyze on the device "{}"'.format(label))
                     logManagement.writeLog(logFilePath, filePrint+'\n', 'utf-8')
                     for files in filesLst:
                         logManagement.writeLog(logFilePath, files+'\n', 'utf-8')
                     test = 30
                     break
                 if test == 29:#no files
-                    print('No files to analyze on the device "' + label + '"')
+                    print('No files to analyze on the device "{}"'.format(label))
                 time.sleep(0.5) #Let the time for the system to get the files
                 test += 1
             if len(filesLst) > 0:
@@ -148,7 +163,7 @@ def init():
 
                 endScan = time.time()
                 totalTimeScan = endScan - beginScan
-                totalTime = 'Device analyzed in '+str(round(totalTimeScan, 5)) + ' seconds.'
+                totalTime = 'Device analyzed in {} seconds.'.format(round(totalTimeScan, 5))
                 print('Device analyzed in ' + colored(str(round(totalTimeScan, 5)), 'yellow') + ' seconds.\n')
                 logManagement.writeLog(logFinalTemp, '\n'+totalTime, 'utf-8')
 

@@ -49,11 +49,11 @@ def final(detected, lstrm, logDirectory):
 
     if allVirus > 0:
         if len(lstrm) == len(detected):
-            resToShow = 'The ' + str(allVirus) + ' found virus(es) was/were removed.'
+            resToShow = 'The {} found virus(es) was/were removed.'.format(allVirus)
             for elem in lstrm:
                 writeLog(logFile, elem + '\n', 'utf-8')
         else:
-            resToShow = '\n' + str(allVirus) + ' virus(es) detected, ' + str(len(lstrm)) + ' removed.'
+            resToShow = '\n {} virus(es) detected, {} removed.'.format(allVirus, len(lstrm))
             for elem in detected:
                 writeLog(logFile, elem + '\n', 'utf-8')
             writeLog(logFile, '---REMOVED---\n', 'utf-8')
@@ -62,10 +62,10 @@ def final(detected, lstrm, logDirectory):
     else:
         resToShow = 'No virus found on your device.'
 
-    allVirusWrite = 'Nb virus found : ' + str(allVirus)
-    rmVirusWrite = 'Nb virus removed : ' + str(len(lstrm))
+    allVirusWrite = 'Nb virus found : {}'.format(allVirus)
+    rmVirusWrite = 'Nb virus removed : {}'.format(len(lstrm))
     notremove = len(detected) - len(lstrm)
-    notrmVirusWrite = 'Nb virus not removed : ' + str(notremove)
+    notrmVirusWrite = 'Nb virus not removed : {}'.format(notremove)
     writeLog(logFile, allVirusWrite + '\n' + rmVirusWrite + '\n' + notrmVirusWrite, 'utf-8')
     writeLog(logFile, '\n' + resToShow, 'utf-8')
     print(colored(resToShow, attrs=['bold']))
@@ -98,10 +98,14 @@ def result(res, detected, rm):
 if __name__ == '__main__':
     detected = []
     lstrm = []
-    dictTestFoundAndDel = {'/media/dev/Win7-AIO-64Bits/virusTest': {'removed': 1, 'type': ' Eicar-Test-Signature '}, '/media/dev/Win7-AIO-64Bits/asdzd': {'removed': 1, 'type': ' Eicar-Test-Signature '}}
-    dictTestFoundAndDel2 = {'/media/dev/autres/virusTest55': {'removed': 1, 'type': ' Eicar-Test-Signature '}, '/media/dev/test/machin': {'removed': 1, 'type': ' Eicar-Test-Signature '}}
-    dictTestFound = {'/media/dev/Win7-AIO-64Bits/film/waynesworld.avi': {'removed': 0, 'type': ' Trojan_horse '}, '/media/dev/Win7-AIO-64Bits/docs/balance_sheet.xls': {'removed': 0, 'type': ' Malicious VBA '}}
-    dictTestFoundPartialDel = {'/media/dev/Win7-AIO-64Bits/docs/other.txt': {'removed': 1, 'type': ' Eicar-Test-Signature '}, '/media/dev/Win7-AIO-64Bits/docs/sdfdfrfd': {'removed': 0, 'type': ' Eicar-Test-Signature '}}
+    dictTestFoundAndDel = {'/media/dev/Win7-AIO-64Bits/virusTest': {'removed': 1, 'type': ' Eicar-Test-Signature '},
+                           '/media/dev/Win7-AIO-64Bits/asdzd': {'removed': 1, 'type': ' Eicar-Test-Signature '}}
+    dictTestFoundAndDel2 = {'/media/dev/autres/virusTest55': {'removed': 1, 'type': ' Eicar-Test-Signature '},
+                            '/media/dev/test/machin': {'removed': 1, 'type': ' Eicar-Test-Signature '}}
+    dictTestFound = {'/media/dev/Win7-AIO-64Bits/film/waynesworld.avi': {'removed': 0, 'type': ' Trojan_horse '},
+                     '/media/dev/Win7-AIO-64Bits/docs/balance_sheet.xls': {'removed': 0, 'type': ' Malicious VBA '}}
+    dictTestFoundPartialDel = {'/media/dev/Win7-AIO-64Bits/docs/other.txt': {'removed': 1, 'type': ' Eicar-Test-Signature '},
+                               '/media/dev/Win7-AIO-64Bits/docs/sdfdfrfd': {'removed': 0, 'type': ' Eicar-Test-Signature '}}
     # detected, lstrm = result(dictTestFoundAndDel, detected, lstrm)
     # detected, lstrm = result(dictTestFoundAndDel2, detected, lstrm)
     # detected, lstrm = result(dictTestFound, detected, lstrm)
@@ -109,8 +113,9 @@ if __name__ == '__main__':
     # print(detected)
     # print(lstrm)
     # final(detected, lstrm)
-    logFilePath1 = "/home/decontamine/LOGS/"+str(datetime.now().strftime('%Y/%m/%d')) + '/' + datetime.now().strftime("%d%m%y%H%M%S")
-    logFilePath = logFilePath1+"Log.txt "
+    logFilePath1 = "/home/decontamine/LOGS/{}".format(datetime.now().strftime('%Y/%m/%d'))
+    logFilePath1 += '/' + datetime.now().strftime("%d%m%y%H%M%S")
+    logFilePath = logFilePath1 + "Log.txt "
     print(logFilePath1)
     print(logFilePath)
     # result(dictTestFound)
