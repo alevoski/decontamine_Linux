@@ -1,4 +1,4 @@
-g#!/usr/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - logManagement.py
 #@Alexandre Buissé - 2018
