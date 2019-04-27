@@ -1,4 +1,9 @@
 CHANGELOG
+27/04/2019
+    Update main.py module
+        correct issue #9 - crash when all antivirus are disabled one by one in configuration
+        find a more proper way to exit the program
+
 17/03/2019
     Continuing code correction with bandit scanner
         tools_scripts/sophos module

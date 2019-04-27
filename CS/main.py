@@ -8,6 +8,7 @@ from datetime import datetime
 import time
 import os
 import subprocess
+from sys import exit
 import getch
 from termcolor import colored
 
@@ -47,9 +48,6 @@ def init():
     Initialization of the cleaning station
     It's the main function
     '''
-    # Check if to exit program.
-    exitStat = False
-
     #Clean log directory
     stats.cleanLog(logDirectory)
 
@@ -72,7 +70,7 @@ def init():
 
     #Test if av or scan modules are present on the system and activated
     res = config.init() #will exit program if no tools find
-    if res == -1:
+    while res == -1 or res == False:
         init()
     print(colored('Scanning tools activated : ', attrs=['underline']))
     #Get a clean table of scanners activated
@@ -102,16 +100,11 @@ def init():
                     init()
 
                 if rep in ['e', 'E']:
-                    exitStat = True
+                    exit(1)
 
-            if exitStat:
-                break
             else:
                 chosen, deviceDict = testPreAnalyse.init()
         # print(deviceDict)
-
-        if exitStat:    # TODO: change cause it's dirty !!
-            break
 
         #Get device attributs
         label, mountpoint, readonly = testPreAnalyse.depackedDeviceDict(deviceDict)
