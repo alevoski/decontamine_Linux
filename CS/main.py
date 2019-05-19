@@ -48,8 +48,14 @@ def init():
     Initialization of the cleaning station
     It's the main function
     '''
-    #Clean log directory
-    stats.cleanLog(logDirectory)
+    # Verify if logDirectory exists
+    if os.path.exists(logDirectory):
+        # Clean log directory
+        stats.cleanLog(logDirectory)
+    else:
+        print('ERROR !')
+        print('You should create "/home/decontamine" directory to store the logs and the conf file !')
+        exit(1)
 
     print("\x1b[2J\x1b[H",end="") # clear
     # colored('install', 'red', attrs=['bold', 'reverse'])

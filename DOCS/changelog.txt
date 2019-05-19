@@ -1,4 +1,8 @@
 CHANGELOG
+19/05/2019
+    Update main.py module
+        init() now verifies if /home/decontamine directory exists
+
 27/04/2019
     Update main.py module
         correct issue #9 - crash when all antivirus are disabled one by one in configuration
