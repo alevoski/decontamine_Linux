@@ -2,6 +2,8 @@ CHANGELOG
 19/05/2019
     Update main.py module
         init() now verifies if /home/decontamine directory exists
+    Update logManagement.py module
+        Remove the two last open() functions and replace them by with open()
 
 27/04/2019
     Update main.py module

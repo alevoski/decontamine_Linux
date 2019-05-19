@@ -30,34 +30,29 @@ def writeLog(logFile, element, codec):
     if not os.path.exists(dirToCreate):
         os.makedirs(dirToCreate)
     try:
-        f = open(logFile, 'a', encoding=codec, errors='ignore')
-        # print(element)
-        f.write(element)
+        with open(logFile, 'a', encoding=codec, errors='ignore') as f:
+            # print(element)
+            f.write(element)
     except Exception:
         print("Can't write the file {} with this element : {}".format(logFile, element))
-    finally:
-        f.close()
-
 
 def writeFinalLog(concatenateBasesFiles, fileLst):
     '''
     Concatenate log files in one final log file
     Take the path to write the final log and the list of log files
     '''
-#    finalFile = open(concatenateBasesFiles, 'w', errors='ignore', encoding='utf-8')
     with open(concatenateBasesFiles, 'w', errors='ignore', encoding='utf-8') as finalFile:
         # print ("fichier final test : "+str(concatenateBasesFiles)) #ok
-
         for i in fileLst:
             while os.path.isfile(i):
                 # print ("testFile : "+str(i)) #ok
-                shutil.copyfileobj(open(i, 'r', errors='ignore', encoding='utf-8'), finalFile)
-                try:
-                    # i.close() #NEVER decomment : could create a very big file in an infinite loop
-                    os.remove(i) #remove concatenated file
-                except Exception:#OSError:
-                    continue
-#    finalFile.close()
+                with open(i, 'r', errors='ignore', encoding='utf-8') as fileToCopy:
+                    shutil.copyfileobj(fileToCopy, finalFile)
+                    try:
+                        # i.close() #NEVER decomment : could create a very big file in an infinite loop
+                        os.remove(i) #remove concatenated file
+                    except Exception:#OSError:
+                        continue
 
 def concat(theFile, theList):
     '''
