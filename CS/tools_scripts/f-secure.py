@@ -9,16 +9,16 @@ import re
 
 #Project modules imports
 from commontools import prompter
-from logManagement import writeLog
+from logManagement import writeLog, writeFirstLine
 
 def init(mountPts, readOnly, logDirectory):
     '''
     Init scan with F-Secure
     '''
     logFile = logDirectory + 'tempF-SecureAV'
-    writeLog(logFile, '\n*****Scan with F-Secure - begin*****\n', 'utf-8')
     scan(mountPts, readOnly, logFile)
-    writeLog(logFile, '\n*****Scan with F-Secure - finish*****\n', 'utf-8')
+    writeLog(logFile, '*****Scan with F-Secure - finish*****\n', 'utf-8')
+    writeFirstLine(logFile, '\n*****Scan with F-Secure - begin*****\n')
 
     virusDict = getVirus(logFile)
     # print(virusDict)

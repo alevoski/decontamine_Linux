@@ -4,6 +4,8 @@ CHANGELOG
         init() now verifies if /home/decontamine directory exists
     Update logManagement.py module
         Remove the two last open() functions and replace them by with open()
+    Update sophos.py, f-secure.py and logManagement modules
+        First lines "Scan with ... - begin" are now displayed with a function writeFirstLine()
 
 27/04/2019
     Update main.py module

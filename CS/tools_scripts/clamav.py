@@ -19,7 +19,7 @@ def init(mountPts, readOnly, logDirectory):
     logFile = logDirectory + 'tempClamAV'
     writeLog(logFile, '\n*****Scan with ClamAV - begin*****\n', 'utf-8')
     res = scan(mountPts, readOnly, logFile)
-    writeLog(logFile, '\n*****Scan with ClamAV - finish*****\n', 'utf-8')
+    writeLog(logFile, '*****Scan with ClamAV - finish*****\n', 'utf-8')
     if res == 1:
         virusDict = getVirus(logFile)
         # print(virusDict)

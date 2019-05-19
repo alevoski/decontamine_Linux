@@ -21,6 +21,15 @@ def extractSTR(line, mystrRGX):
     # print(temp)
     return temp.replace('\n', '')
 
+def writeFirstLine(logFile, line):
+    '''
+    Write first line in a file
+    '''
+    with open(logFile, 'r+') as f:
+        content = f.read()
+        f.seek(0, 0)
+        f.write(line.rstrip('\r\n') + '\n' + content)
+
 def writeLog(logFile, element, codec):
     '''Write log on the station'''
     # print(repr(element))

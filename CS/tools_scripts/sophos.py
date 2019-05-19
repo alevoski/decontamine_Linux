@@ -8,16 +8,16 @@ import subprocess
 import re
 
 #Project modules imports
-from logManagement import writeLog, deleter
+from logManagement import writeLog, deleter, writeFirstLine
 
 def init(mountPts, readOnly, logDirectory):
     '''
     Init scan with Sophos
     '''
     logFile = logDirectory + 'tempSophosAV'
-    writeLog(logFile, '\n*****Scan with Sophos - begin*****\n', 'utf-8')
     res = scan(mountPts, readOnly, logFile)
-    writeLog(logFile, '\n*****Scan with Sophos - finish*****\n', 'utf-8')
+    writeLog(logFile, '*****Scan with Sophos - finish*****\n', 'utf-8')
+    writeFirstLine(logFile, '\n*****Scan with Sophos - begin*****\n')
 
     # Clean the log of not usefull informations
     deleter(logFile, 'Using IDE file')
