@@ -8,6 +8,7 @@ import subprocess
 import re
 
 #Project modules imports
+from commontools import startPROC, statusPROC, waitandcheck
 from logManagement import writeLog, deleter, writeFirstLine
 
 def init(mountPts, readOnly, logDirectory):
@@ -15,18 +16,23 @@ def init(mountPts, readOnly, logDirectory):
     Init scan with Sophos
     '''
     logFile = logDirectory + 'tempSophosAV'
-    res = scan(mountPts, readOnly, logFile)
-    writeLog(logFile, '*****Scan with Sophos - finish*****\n', 'utf-8')
+    statusCode = scan(mountPts, readOnly, logFile)
     writeFirstLine(logFile, '\n*****Scan with Sophos - begin*****\n')
+    endingSentence = '*****Scan with Sophos - finish*****\n'
 
     # Clean the log of not usefull informations
     deleter(logFile, 'Using IDE file')
-
-    if res == 3:
+    
+    if statusCode == 1:
+        statusCode = -15 # Change with a commonly shared status code
+        endingSentence = '*****Scan with Sophos has been stopped*****\n'
+    writeLog(logFile, endingSentence, 'utf-8')
+    
+    if statusCode == 3 or statusCode == -15:
         virusDict = getVirus(logFile)
         # print(virusDict)
-        return virusDict, logFile
-    return res, logFile
+        return statusCode, virusDict, logFile
+    return statusCode, 0, logFile
 
 def getVirus(logFile):
     '''
@@ -79,10 +85,19 @@ def scan(mountPts, readOnly, logFile):
         cmdline = ['/usr/local/bin/savscan', '-remove', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', '--no-reset-atime', mountPts, '-p=' + logFile]
     print('Scan begin')
     try:
-        res = str(subprocess.check_output(cmdline), 'utf-8')
+        # res = str(subprocess.check_output(cmdline), 'utf-8')
         # print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
-        return 0
+        # return 0
+        print("Press 's' to stop the scan")
+        procID = startPROC(cmdline, 1)
+        procStatus = statusPROC(procID)
+        # print('status', procStatus)
+        waitandcheck(procStatus, procID)
+        procStatus = statusPROC(procID)
+        # print('status sophos', procStatus)
+        return procStatus
+        
     except subprocess.CalledProcessError as e:#Error
         # print(e)
         p = re.findall(r'exit status.*?(\d+)', str(e))

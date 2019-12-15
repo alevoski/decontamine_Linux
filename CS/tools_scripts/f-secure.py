@@ -8,7 +8,7 @@ import subprocess
 import re
 
 #Project modules imports
-from commontools import prompter
+from commontools import prompter, startPROC, statusPROC, waitandcheck
 from logManagement import writeLog, writeFirstLine
 
 def init(mountPts, readOnly, logDirectory):
@@ -16,13 +16,20 @@ def init(mountPts, readOnly, logDirectory):
     Init scan with F-Secure
     '''
     logFile = logDirectory + 'tempF-SecureAV'
-    scan(mountPts, readOnly, logFile)
-    writeLog(logFile, '*****Scan with F-Secure - finish*****\n', 'utf-8')
+    statusCode = scan(mountPts, readOnly, logFile)
+    endingSentence = '*****Scan with F-Secure - finish*****\n'
     writeFirstLine(logFile, '\n*****Scan with F-Secure - begin*****\n')
 
-    virusDict = getVirus(logFile)
-    # print(virusDict)
-    return virusDict, logFile
+    if statusCode == 143:
+        statusCode = -15 # Change with a commonly shared status code
+        endingSentence = '*****Scan with F-Secure has been stopped*****\n'
+    writeLog(logFile, endingSentence, 'utf-8')
+
+    if statusCode == 3:
+        virusDict = getVirus(logFile)
+        # print(virusDict)
+        return statusCode, virusDict, logFile
+    return statusCode, 0, logFile
 
 def getVirus(logFile):
     '''
@@ -63,6 +70,10 @@ def getVirus(logFile):
 def scan(mountPts, readOnly, logFile):
     '''
     Scan the mounting point in parameters.
+    Return a code
+        0 : No virus
+        3 : Virus found
+        143 : Scan stopped by user
     '''
     cmdline = ['/usr/bin/fsav', '--virus-action1=report', '--allfiles', '--archive', '--maxnested=15', '--scantimeout=180', mountPts]
     if not readOnly:
@@ -71,9 +82,19 @@ def scan(mountPts, readOnly, logFile):
         if 'y' in str(rep):
             cmdline = ['/usr/bin/fsav', '--virus-action1=clean', '--virus-action2=remove', '--auto', '--allfiles', '--archive', '--maxnested=15', '--scantimeout=180', mountPts]
     print('Scan begin')
+    
+    print("Press 's' to stop the scan")
+    procStatus = '?'
     with open(logFile, mode='w', encoding='utf-8') as flog:
-        subprocess.call(cmdline, stdout=flog)
-
+        # subprocess.call(cmdline, stdout=flog)
+        procID = startPROC(cmdline, 2, flog)
+        procStatus = statusPROC(procID)
+        # print('status', procStatus)
+        waitandcheck(procStatus, procID)
+        procStatus = statusPROC(procID)
+        # print('status', procStatus)
+    return procStatus
+        
 def version():
     '''
     Return version informations of F-Secure

@@ -1,4 +1,25 @@
 CHANGELOG
+11/12/2019 - 14/12/2019
+    Resolve issue #4 - Option to stop a scan
+        Update commontools.py module
+            mykbhit() now directly return the input char
+            Add 4 new functions
+                startPROC()
+                statusPROC()
+                stopPROC()
+                waitandcheck()
+        Update analyze.py module
+            init() now receive status code from scanning tools
+        Update clamav.py, sophos.py and f-secure.py modules
+            scan() now can manage to stop the scanning process on user demand
+            init() now receive status code from scan()
+    
+    Remove a while loop in init() from main.py module
+    
+    Open a new issue around testPreAnalyse.py module
+        Devices with no label are not detected
+        It will be patch asap
+        
 19/05/2019
     Update main.py module
         init() now verifies if /home/decontamine directory exists

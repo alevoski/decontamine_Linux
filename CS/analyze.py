@@ -25,7 +25,9 @@ def init(toolsDict, mountPoint, readOnly, logDirectory):
         toolPath = 'tools_scripts'
         # try:
         tocall = import_from(toolPath, tool)
-        res, logAVTemp = tocall.init(mountPoint, readOnly, logDirectory)
+        statusCode, res, logAVTemp = tocall.init(mountPoint, readOnly, logDirectory)
+        if statusCode == -15:
+            print(colored('Scan has been stopped !', 'red'))
         lstLogAV.append(logAVTemp)
         if type(res) is dict and len(res) > 0:
             print('\n'+colored(k, 'green') + ' found something !')

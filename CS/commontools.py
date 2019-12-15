@@ -6,6 +6,7 @@
 #Standard imports
 import re
 import getch
+import subprocess
 from termcolor import colored
 
 #Project modules imports
@@ -30,9 +31,9 @@ def mykbhit():
     while test < 15000:
         # print(test)
         if kb.kbhit():
-            # c = kb.getch()
+            c = kb.getch()
             # print(c)
-            return True
+            return c
         test += 1
 
 def createTable(theDict, column1, column2):
@@ -89,9 +90,46 @@ def prompter(toAsk):
     while True:
         print(toAsk)
         rep = str(getch.getch())
-#        if 'y' in str(rep) or 'n' in str(rep):
         if rep in ['y', 'n']:
             break
     return rep
+
+def startPROC(procname, mode, fwrite=''):
+    '''
+    Start a process and return its process id
+    '''
+    if mode == 1: # non blocking mode
+        proc = subprocess.Popen(procname, shell=False)
+    elif mode == 2: # non blocking mode + redirect stdout
+        proc = subprocess.Popen(procname, stdout=fwrite, shell=False)
+    else:
+        proc = subprocess.check_output([procname]) # Blocking call
+    return proc
+
+def statusPROC(proc):
+    '''
+    Return process status code
+    '''
+    return proc.poll()
+
+def stopPROC(proc):
+    '''
+    Kill a process and wait until it terminate
+    '''
+    # proc.kill()
+    proc.terminate()
+    proc.wait()
+
+def waitandcheck(procStatus, procID):
+    '''
+    Wait for process to terminate itself
+    Meanwhile, check if user wants to stop process
+    '''
+    while procStatus == None:
+        procStatus = statusPROC(procID)
+        if procStatus != None:
+            break
+        if mykbhit() in ['s', 'S']:
+            stopPROC(procID)
 
 #https://repolinux.wordpress.com/2012/10/09/non-blocking-read-from-stdin-in-python/

@@ -37,7 +37,7 @@ def dismount(mountPTS):
             print('Success to umount your device !')
         else:
             print('Cannot umount your device !')
-        print('Tape a key to exit.')
+        print('Press any key to exit.')
         if getch.getch():
             pass
     elif rep in ['n', 'N']:
@@ -94,25 +94,22 @@ def init():
         print(phrase)
 
     while True:
-        #Test if drives to analyze
+        # Test if drives to analyze
         chosen = 0
         print('\nPlease insert a drive to analyze')
         while chosen == 0:
-            if commontools.mykbhit():
-                rep = str(getch.getch())        # TODO: Some idle while wait for a key. Why ?
-                if rep in ['c', 'C']:     #enter config mode
-                    print("\x1b[2J\x1b[H",end="") # clear
-                    rep = config.configurator(avcompatibleDict)
-                    init()
+            rep = commontools.mykbhit()
+            if rep in ['c', 'C']:   # Enter config mode
+                print("\x1b[2J\x1b[H",end="") # clear
+                rep = config.configurator(avcompatibleDict)
+                init()
+            if rep in ['e', 'E']:   # Exit
+                exit(1)
 
-                if rep in ['e', 'E']:
-                    exit(1)
+            chosen, deviceDict = testPreAnalyse.init() # Will not take any user input during the test
+        # print(chosen, deviceDict)
 
-            else:
-                chosen, deviceDict = testPreAnalyse.init()
-        # print(deviceDict)
-
-        #Get device attributs
+        # Get device attributs
         label, mountpoint, readonly = testPreAnalyse.depackedDeviceDict(deviceDict)
 
         if mountpoint != '':
@@ -132,7 +129,7 @@ def init():
             element = element1+element1b+element1c+element2
             logManagement.writeLog(logFilePath, element, 'utf-8')#write logfile
 
-            #Get files
+            # Get files
             test = 1
             while test < 30:
                 beginScan = time.time()

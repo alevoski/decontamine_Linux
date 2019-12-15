@@ -8,7 +8,7 @@ import subprocess
 import re
 
 #Project modules imports
-from commontools import prompter
+from commontools import prompter, startPROC, statusPROC, waitandcheck
 from logManagement import writeLog
 
 
@@ -18,13 +18,16 @@ def init(mountPts, readOnly, logDirectory):
     '''
     logFile = logDirectory + 'tempClamAV'
     writeLog(logFile, '\n*****Scan with ClamAV - begin*****\n', 'utf-8')
-    res = scan(mountPts, readOnly, logFile)
-    writeLog(logFile, '*****Scan with ClamAV - finish*****\n', 'utf-8')
-    if res == 1:
+    statusCode = scan(mountPts, readOnly, logFile)
+    endingSentence = '*****Scan with ClamAV - finish*****\n'
+    if statusCode == -15:
+        endingSentence = '*****Scan with ClamAV has been stopped*****\n'
+    writeLog(logFile, endingSentence, 'utf-8')
+    if statusCode == 1 or statusCode == -15:
         virusDict = getVirus(logFile)
         # print(virusDict)
-        return virusDict, logFile
-    return res, logFile
+        return statusCode, virusDict, logFile
+    return statusCode, 0, logFile
 
 def getVirus(logFile):
     '''
@@ -66,7 +69,7 @@ def scan(mountPts, readOnly, logFile):
             0 : No virus
             1 : Virus found
             2 : Error
-            3 : Scan stopped by user
+            -15 : Scan stopped by user
     '''
     cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--fdpass', '-l', logFile, mountPts]
     if not readOnly:
@@ -78,10 +81,20 @@ def scan(mountPts, readOnly, logFile):
             pass
     print('Scan begin')
     try:
-        res = str(subprocess.check_output(cmdline), 'utf-8')
+        # res = str(subprocess.check_output(cmdline), 'utf-8')
+        
         #print(res)
         # p = re.findall('Infected files:*?(\d+)', str(res))
-        return 0
+        # return 0
+        print("Press 's' to stop the scan")
+        procID = startPROC(cmdline, 1)
+        procStatus = statusPROC(procID)
+        # print('status', procStatus)
+        waitandcheck(procStatus, procID)
+        procStatus = statusPROC(procID)
+        # print('status', procStatus)
+        return procStatus
+        
     except subprocess.CalledProcessError as e:#Error
         p = re.findall(r'exit status.*?(\d+)', str(e))
 
