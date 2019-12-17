@@ -1,4 +1,16 @@
 CHANGELOG
+17/12/2019
+    Resolve issue #2 - os.system in config module
+        Update config.py module
+            configparser librairy is now in used
+            1 new function
+                updateConfFile()
+            2 functions revamped
+                getConfInfos()
+                setConfInfos()
+            The conf file is now a global var
+            Remove extractSTR() import from logManagement.py module
+            
 11/12/2019 - 14/12/2019
     Resolve issue #4 - Option to stop a scan
         Update commontools.py module
