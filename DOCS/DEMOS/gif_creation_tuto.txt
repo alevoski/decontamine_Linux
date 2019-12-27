@@ -7,9 +7,12 @@ Go to "Media/Convert/Save..."
     Capture Device
         Capture mode : Desktop
         Options : 2 FPS
+        If you have two screens and just wand to target one of them:
+            Show more options
+            Add this in Edit Options " :screen-left=1920"   (it will target the right screen, both my screens have horizontal resolution of 1920px)
     Profile
         Video H.264 (in the settings I disabled the audio)
-    Choose a destination file the start
+    Choose a destination file then start
 When you have nothing more to film, press the stop button in VLC.
 
 2) Get the image files from the video

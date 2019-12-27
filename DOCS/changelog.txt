@@ -1,8 +1,15 @@
 CHANGELOG
+27/12/2019
+    Correct a bug in config.py module in getConfInfos()
+    Resolve issue #10 - Devices with no label (no name) are not detected
+        Update testPreAnalyse.py module
+            mountPtsList() won't work anymore, all drives goes to mountPtsDIR() instead
+            mountPtsDIR() take one more parameter : iduid which can be tested if an empty label has been provided
+
 17/12/2019
     Resolve issue #2 - os.system in config module
         Update config.py module
-            configparser librairy is now in used
+            configparser library is now used
             1 new function
                 updateConfFile()
             2 functions revamped
@@ -10,7 +17,7 @@ CHANGELOG
                 setConfInfos()
             The conf file is now a global var
             Remove extractSTR() import from logManagement.py module
-            
+
 11/12/2019 - 14/12/2019
     Resolve issue #4 - Option to stop a scan
         Update commontools.py module

@@ -103,14 +103,20 @@ def devicesList(objID, driveType, driveBus, ejectable):
                         device = drive_info.get('Device')
                         readOnly = drive_info.get('ReadOnly')
                         label = drive_info.get('IdLabel')
+                        drive = drive_info.get('Drive')
+                        iduid = drive_info.get('IdUUID')
                         device = bytearray(device).replace(b'\x00', b'').decode('utf-8')
                         # print('device', device)
                         # print('readOnly', readOnly)
                         # print('drive', drive_info.get('Drive'))
                         # print('label', str(label))
+                        # print('hintname', str(hintname))
+                        # print('test', drive_info.get('Id'))
+                        # print('test', drive_info.get('DeviceNumber'))
+                        # print('test', iduid)
 
                         # print('lenlabel : ', len(label))
-                        if len(label) != 0:
+                        if len(label) != 0 or len(iduid) != 0:
                             # print('label ok')
                             # Get mount points lists of the founded drive devices
                             test = 0
@@ -121,16 +127,21 @@ def devicesList(objID, driveType, driveBus, ejectable):
                                 if mountPts == '?' and 'optical' in driveType:
                                     # print('optical drive')
                                     mountPts = mountPtsOptical()
-                                else:
+                                # For USB drives with label
+                                elif len(label) != 0:
                                     try:
-                                        mountPts = mountPtsList(str(label))
+                                        # print('usb ?')
+                                        mountPts = mountPtsList(str(label))#, str(iduid))
+                                        # print('USB mountPtsList : ' + mountPts)
                                     except Exception:
                                         pass
 
-                                # For drives with more than 1 devices
+                                # For drives with more than 1 devices or USB drives without label
                                 if mountPts == '?':
                                     try:
-                                        mountPts = mountPtsDIR(str(label))
+                                        # print('other usb')
+                                        mountPts = mountPtsDIR(str(label), str(iduid))
+                                        # print('other USB mountPts : ' + mountPts)
                                     except Exception:
                                         pass
 
@@ -140,7 +151,8 @@ def devicesList(objID, driveType, driveBus, ejectable):
                                 # print(test)
                                 time.sleep(1)
                                 test += 1
-
+                            if len(label) == 0:
+                                label = iduid
                             devices[str(device)] = {'label':str(label),
                                                     'readOnly':int(readOnly),
                                                     'mountPts':str(mountPts)}
@@ -159,13 +171,15 @@ def devicesList(objID, driveType, driveBus, ejectable):
 
     return devices
 
-def mountPtsList(device):
+def mountPtsList(device):#, iduid):
     '''
     Get mount point of a device label passed in parameter.
     Return the device label mount point.
     Won't work on drives with multiple partitions (it only detects one) neither on optical disk
+    Update 2019/12 : won't work anymore, all drives goes to mountPtsDIR() instead
     '''
     # print(device, ' tested')
+    # print(iduid, ' tested')
     mntptsRt = '?'
 
     # Method 1 - Filesystem (UDisks2)
@@ -174,12 +188,14 @@ def mountPtsList(device):
     obj = bus.get_object('org.freedesktop.UDisks2', '/org/freedesktop/UDisks2')
     iface = dbus.Interface(obj, 'org.freedesktop.DBus.ObjectManager')
 
+    # print('before for loop')
     for k, v in iface.GetManagedObjects().items():
         mount_point = ''
         drive_info = v.get('org.freedesktop.UDisks2.Filesystem', {})
         # devices = {}
-        # print(str(objID))
+        # print(str(drive_info))
         mntpts = drive_info.get('MountPoints')
+        # print(mntpts)
         for letter in mntpts[0]:
             mount_point += chr(letter)
         # print('mount_point :', mount_point)
@@ -187,23 +203,32 @@ def mountPtsList(device):
         # print('mount_point :', str(mount_point[:-1]))
         # print('type',type(drive_info.get('MountPoints')))
         # print('before condition')
-        if str(device) in str(mount_point):
+        if str(device) in str(mount_point):# or str(iduid) in str(mount_point):
             # print('mount point find')
             # print(str(device), str(mount_point))
             # print(str(mount_point))
             mntptsRt = str(mount_point[:-1])
             return mntptsRt
 
-def mountPtsDIR(device):
+def mountPtsDIR(device, iduid):
     '''
     Method 2 - /media/ to get mount points
     '''
+    # print('len(device)', len(device))
+    # print('device', device)
+    # print('len(iduid)', len(iduid))
+    # print('iduid', iduid)
     mntptsRt = '?'
-    mounted = os.listdir('/media/'+getpass.getuser())
-    if device in mounted:
-        mntptsRt = '/media/'+getpass.getuser()+'/'+device
+    mounted = os.listdir('/media/' + getpass.getuser())
+    # print('mount : ', mounted)
+    if device in mounted: # For USB
+        # print('usb')
+        mntptsRt = '/media/' + getpass.getuser() + '/'+ device
         # print(mntptsRt)
-
+    if iduid in mounted and len(device) == 0: # For USB without label
+        # print('other usb')
+        mntptsRt = '/media/' + getpass.getuser() + '/'+ iduid
+    # print(mntptsRt)
     return mntptsRt
 
 def mountPtsOptical():
@@ -222,7 +247,7 @@ def userChoiceFT(theLST, elem):
     '''
     Prompt the user
     '''
-    print(theLST)
+    # print(theLST)
     userChoice = -1
     while userChoice not in theLST:
         try:
@@ -248,18 +273,18 @@ def choseDrive(theDict):
     lstKeys = []
     i = 0
     for drives in theDict.keys():
-        try:#python2
+        try: # python2
             print('{} - {}'.format(theDict.keys().index(drives), drives))
             lstKeys.append(theDict.keys().index(drives))
-        except Exception:#python3
+        except Exception: # python3
             print('{} - {}'.format(i, drives))
             lstKeys.append(i)
             i += 1
     userChoice = userChoiceFT(lstKeys, 'drive')
-    try:#python2
+    try: # python2
         print('\nYou chose the drive {}'.format(theDict.keys()[userChoice]))
         return theDict.keys()[userChoice]
-    except Exception:#python3
+    except Exception: # python3
         print('\nYou chose the drive {}'.format(list(theDict.keys())[userChoice]))
         return list(theDict.keys())[userChoice]
 
@@ -279,16 +304,16 @@ def choseDevice(theDict, theDrive):
                 i += 1
 
     tempDict = {}
-    tempDict = allDevices #by default => one device
-    if len(allDevices) > 1:#more than one device on the drive
+    tempDict = allDevices # by default => one device
+    if len(allDevices) > 1: # more than one device on the drive
         lstDevices = []
         print('Multiple devices detected for drive '+theDrive)
         i = 0
         for k, values in allDevices.items():
-            try:#python2
+            try: # python2
                 print('{} - {}'.format(allDevices.keys().index(k), values['label']))
                 lstDevices.append(allDevices.keys().index(k))
-            except Exception:#python3
+            except Exception: # python3
                 print("{} - {}".format(i, values['label']))
                 lstDevices.append(i)
                 i += 1
@@ -336,29 +361,28 @@ def init():
     Init the process of finding (and choosing) devices to scan,
     Return the device chosen (automaticly if one device found) and its informations dict
     '''
-    #Get all detected drives
+    # Get all detected drives
     objDict = deviceInfo()
 
-    #Chose a drive (if only 1 drive = autochose this one)
+    # Chose a drive (if only 1 drive = autochose this one)
     if len(objDict.keys()) > 1:
         chosen = choseDrive(objDict)
-        # print(chosen)
+
     elif len(objDict.keys()) == 1:
-        try: #python2
+        try: # python2
             chosen = objDict.keys()[0]
-            # print('one drive : '+chosen)
-        except Exception: #python3
-            # print(objDict)
+
+        except Exception: # python3
             chosen = list(objDict.keys())
-            # print('one drive : '+chosen[0])
+            # print('one drive : ' + chosen[0])
     else:
         return 0, 0
 
-    #Get devices of the drive selected
+    # Get devices of the drive selected
     try:
-        deviceDict = choseDevice(objDict, chosen)#python2
+        deviceDict = choseDevice(objDict, chosen) # python2
     except Exception:
-        deviceDict = choseDevice(objDict, chosen[0]) #python3
+        deviceDict = choseDevice(objDict, chosen[0]) # python3
 
     return chosen, deviceDict
 

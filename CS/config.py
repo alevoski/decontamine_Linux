@@ -132,8 +132,8 @@ def getConfInfos():
 
         if int(actif[-1:]) == 1:
             if toupdate == 1: # Get tool version and update file
-                version = str(getVersion(tool))
-                updateConfFile(tool, 'version', version)
+                version = str(getVersion(name))
+                updateConfFile(name, 'version', version)
             toolsDict[name] = str(version)
         
         if int(actif[-1:]) == 0:

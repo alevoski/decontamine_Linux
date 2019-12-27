@@ -29,7 +29,5 @@ Top priorities
     Analyze with Bitdefender   
     Analyze with Avast       
     Analyze with ope (office, pdf and exe) module
-    Option to stop the scan
-        Considerate the stop in the final log
     Force umount (CD/DVD)
     Full umount
