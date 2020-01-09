@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-#Decontamine Linux - logManagement.py
-#@Alexandre Buissé - 2018
+#Decontamine Linux - logmanagement.py
+#@Alexandre Buissé - 2018/2020
 
 #Standard imports
 import re
@@ -13,104 +13,86 @@ import fileinput
 #Project modules imports
 from commontools import prompter
 
-def extractSTR(line, mystrRGX):
-    '''Extract str'''
-    # p = re.search(')
-    # mystrRGX = 'av_name = '#"([^"]+)"'
-    temp = re.split(mystrRGX, line)[-1]
-    # print(temp)
-    return temp.replace('\n', '')
-
-def writeFirstLine(logFile, line):
+def write_first_line(log_file, line):
     '''
     Write first line in a file
     '''
-    with open(logFile, 'r+') as f:
-        content = f.read()
-        f.seek(0, 0)
-        f.write(line.rstrip('\r\n') + '\n' + content)
+    with open(log_file, mode='r+') as file2write:
+        content = file2write.read()
+        file2write.seek(0, 0)
+        file2write.write(line.rstrip('\r\n') + '\n' + content)
 
-def writeLog(logFile, element, codec):
+def writelog(log_file, element, codec):
     '''Write log on the station'''
     # print(repr(element))
     #Create a directory where all the logs will be stored
-    dirToCreate = os.path.dirname(os.path.abspath(logFile))
-    # print (dirToCreate)
-    if not os.path.exists(dirToCreate):
-        os.makedirs(dirToCreate)
+    dir_to_create = os.path.dirname(os.path.abspath(log_file))
+    # print (dir_to_create)
+    if not os.path.exists(dir_to_create):
+        os.makedirs(dir_to_create)
     try:
-        with open(logFile, 'a', encoding=codec, errors='ignore') as f:
+        with open(log_file, mode='a', encoding=codec, errors='ignore') as file2write:
             # print(element)
-            f.write(element)
+            file2write.write(element)
     except Exception:
-        print("Can't write the file {} with this element : {}".format(logFile, element))
+        print("Can't write the file {} with this element : {}".format(log_file, element))
 
-def writeFinalLog(concatenateBasesFiles, fileLst):
+def write_final_log(concatenate_base_files, logs):
     '''
     Concatenate log files in one final log file
     Take the path to write the final log and the list of log files
     '''
-    with open(concatenateBasesFiles, 'w', errors='ignore', encoding='utf-8') as finalFile:
-        # print ("fichier final test : "+str(concatenateBasesFiles)) #ok
-        for i in fileLst:
+    with open(concatenate_base_files, mode='w', encoding='utf-8', errors='ignore') as final_file:
+        # print ("fichier final test : "+str(concatenate_base_files)) #ok
+        for i in logs:
             while os.path.isfile(i):
                 # print ("testFile : "+str(i)) #ok
-                with open(i, 'r', errors='ignore', encoding='utf-8') as fileToCopy:
-                    shutil.copyfileobj(fileToCopy, finalFile)
+                with open(i, mode='r', encoding='utf-8', errors='ignore') as file2copy:
+                    shutil.copyfileobj(file2copy, final_file)
                     try:
                         # i.close() #NEVER decomment : could create a very big file in an infinite loop
                         os.remove(i) #remove concatenated file
                     except Exception:#OSError:
                         continue
 
-def concat(theFile, theList):
+def concat(the_file, the_list):
     '''
     Append a file to a list
     '''
-    if type(theFile) is list:
-        for logs in theFile:
-            theList.append(logs)
+    if isinstance(the_file, list):
+        for logs in the_file:
+            the_list.append(logs)
     else:
-        theList.append(theFile)
-    return theList
+        the_list.append(the_file)
+    return the_list
 
-def readLog(finalLog):
+def readlog(final_log):
     '''
     Prompt the user to read the final log
     '''
     rep = prompter('Do you want to read the detail of the scan ? (y/n)')
     if rep == 'y':
-        subprocess.call(('xdg-open', str(finalLog)))
+        subprocess.call(('xdg-open', str(final_log)))
     elif rep == 'n':
         pass
 
-def getLog(finalLog, mountPTS):
+def getlog(final_log, mount_pts):
     '''
     Prompt the user to get a copy of the final log
     '''
     rep = prompter('Do you want a copy of the detail of the scan ? (y/n)')
     if rep == 'y':
-        copiedFile = mountPTS + '/' + os.path.basename(finalLog)
-        # print(finalLog)
-        shutil.copy2(finalLog, copiedFile)
-        # print(copiedFile)
-        if os.path.isfile(copiedFile):
-            print('The result of the scan have been copied on the device ' + mountPTS)
+        copied_file = mount_pts + '/' + os.path.basename(final_log)
+        # print(final_log)
+        shutil.copy2(final_log, copied_file)
+        # print(copied_file)
+        if os.path.isfile(copied_file):
+            print('The result of the scan have been copied on the device ' + mount_pts)
     elif rep == 'n':
         pass
 
-def replacer(logfile, elemOri, elem):
-    '''Replace elemOri with elem in logfile'''
-    with open(logfile, 'r') as f:
-        filedata = f.read()
-
-    newdata = filedata.replace(elemOri, elem)
-
-    with open(logfile, 'w') as f:
-        f.write(newdata)
-
-def deleter(logfile, elem):
-    '''Delete line containing elem in logfile'''
-    for line in fileinput.input(logfile, inplace=True):
+def deleter(log_file, elem):
+    '''Delete line containing elem in log_file'''
+    for line in fileinput.input(log_file, inplace=True):
         if not re.search(elem, line):
             print(line, end='')

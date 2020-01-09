@@ -1,81 +1,84 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - stats.py
-#@Alexandre Buissé - 2018
+#@Alexandre Buissé - 2018/2020
 
 #Standard imports
 import os
 
 #Project modules imports
-from commontools import extractNumber
+from commontools import extract_number
 
-def stat(fileLogs):
+def stat(log_dir):
     '''
-    Count and return the number of files and the number of virus in the directory passed in parameter with globalStat()
+    Count and return the number of files and the number of virus in the directory passed in parameter with global_stat()
     '''
-    nbcount = []
-    statVirusD = 0
-    statVirus = 0
-    for root, dirnames, filenames in os.walk(fileLogs + 'LOGS/'):
+    nb_scan = []
+    virus_detected = 0
+    virus_removed = 0
+    nb_virus_detect = 0
+    nb_virus_del = 0
+    for root, dirnames, filenames in os.walk(log_dir + 'LOGS/'):
         for files in filenames:
             # print(files)
-            theDir = str(dirnames).replace("[]", "/")
-            filePath = os.path.abspath(str(root)+str(theDir)+str(files))
+            the_dir = str(dirnames).replace("[]", "/")
+            file_path = os.path.abspath(str(root) + str(the_dir) + str(files))
             if "FINAL" in files:
-                nbcount.append(files)
-            # print(nbcount)
-            # print(filePath)
-            #removed viruses
+                nb_scan.append(files)
+            # print(nb_scan)
+            # print(file_path)
+            # Get detected viruses and removed viruses
             try:
-                nbVirusDetect, nbVirusDel = globalStat(filePath)
+                nb_virus_detect, nb_virus_del = global_stat(file_path)
             except UnicodeDecodeError:
                 continue
-            # print("virus per files  : ", nbVirusDel, filePath)
-            statVirusD = statVirusD + nbVirusDetect
-            statVirus = statVirus + nbVirusDel
-    return len(nbcount), statVirusD, statVirus
+            # print("virus per files  : ", nb_virus_del, file_path)
+            virus_detected = virus_detected + nb_virus_detect
+            virus_removed = virus_removed + nb_virus_del
+    return len(nb_scan), virus_detected, virus_removed
 
-def globalStat(files):
+def global_stat(files):
     '''
     Get and return the number of virus detected and the number of virus removed with the log file passed in parameter
     '''
-    nbVirusDetect = 0
-    nbVirusDel = 0
+    nb_virus_detect = 0
+    nb_virus_del = 0
 
-    # @Alex : f.close() cant be forgotten (https://docs.python.org/3/tutorial/errors.html - 8.7)
-    with open(files, 'r', encoding='utf-8') as f:
-        for line in f:
+    with open(files, mode='r', encoding='utf-8') as logfile:
+        for line in logfile:
             # print(line)
             if "Nb virus found" in line:
-                nbVirusDetect = extractNumber(line)
-                # print(str(files)+' nbVirusDetect:'+str(nbVirusDetect))
+                nb_virus_detect = extract_number(line)
+                # print(str(files)+' nb_virus_detect:'+str(nb_virus_detect))
             if "Nb virus removed" in line:
-                nbVirusDel = extractNumber(line)
-                # print(str(files)+' nbVirusDel:'+str(nbVirusDel))
-    return nbVirusDetect, nbVirusDel
+                nb_virus_del = extract_number(line)
+                # print(str(files)+' nb_virus_del:'+str(nb_virus_del))
+    return nb_virus_detect, nb_virus_del
 
-def cleanLog(logDir):
-    '''Clean the log directory'''
-    for root, dirnames, filenames in os.walk(logDir + 'LOGS/'):
+def cleanlog(log_dir):
+    '''
+    Clean the log directory
+    '''
+    for root, dirnames, filenames in os.walk(log_dir + 'LOGS/'):
         # print ("files :"+str(filenames))
         #Deleted not finalized logs or empty logs
         for files in filenames:
-            theDir = str(dirnames).replace("[]", "/")
-            filePath = os.path.abspath(str(root)+str(theDir)+str(files))
-            # print(os.path.getsize(filePath)) #test ok
-            if ("FINAL" in files or "STAT" in files) and (os.path.getsize(filePath) != 0):
+            the_dir = str(dirnames).replace("[]", "/")
+            file_path = os.path.abspath(str(root) + str(the_dir) + str(files))
+            # print(os.path.getsize(file_path)) #test ok
+            if ("FINAL" in files or "STAT" in files) and (os.path.getsize(file_path) != 0):
                 # print("ok")
                 pass
             else:
                 # print(files," supress")
                 try:
-                    os.remove(os.path.abspath(filePath))
+                    os.remove(os.path.abspath(file_path))
                 except Exception:
                     pass
 
-        #Removed empty directories
-        for theDir in dirnames:
-            subdirpath = os.path.abspath(str(root)+"/"+str(theDir))
+        # Removed empty directories
+        for the_dir in dirnames:
+            subdirpath = os.path.abspath(str(root) + "/" + str(the_dir))
             # print(subdirpath)
             if os.listdir(subdirpath) == []:
                 # print("vide",subdirpath) #ok
@@ -85,4 +88,4 @@ def cleanLog(logDir):
                     pass
 
 if __name__ == '__main__':
-    nbScan, virusdetected, virusremoved = stat('/home/decontamine/')
+    print(stat('/home/decontamine/'))

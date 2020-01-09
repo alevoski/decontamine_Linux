@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - main.py
-#@Alexandre Buissé - 2018
+#@Alexandre Buissé - 2018/2020
 
 #Standard imports
 from datetime import datetime
@@ -15,25 +15,20 @@ from termcolor import colored
 #Project modules imports
 import stats
 import config
-import testPreAnalyse
+import testpreanalyse
 import analyze
 import commontools
-import logManagement
+import logmanagement
 
-avcompatibleDict = {'ClamAV':'clamdscan',
-                    'Sophos':'savscan',
-                    'F-Secure':'fsav'}
-# modulescompatibleDict = {}
+LOG_DIRECTORY = '/home/decontamine/'
 
-logDirectory = '/home/decontamine/'
-
-def dismount(mountPTS):
+def dismount(mount_pts):
     '''
     Prompt the user to dismount and take back his device
     '''
     rep = commontools.prompter('Do you want to eject and get back your device ? (y/n)')
     if rep in ['y', 'Y']:
-        if subprocess.call(['/bin/umount', str(mountPTS)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+        if subprocess.call(['/bin/umount', str(mount_pts)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
             print('Success to umount your device !')
         else:
             print('Cannot umount your device !')
@@ -48,49 +43,48 @@ def init():
     Initialization of the cleaning station
     It's the main function
     '''
-    # Verify if logDirectory exists
-    if os.path.exists(logDirectory):
+    # Verify if LOG_DIRECTORY exists
+    if os.path.exists(LOG_DIRECTORY):
         # Clean log directory
-        stats.cleanLog(logDirectory)
+        stats.cleanlog(LOG_DIRECTORY)
     else:
         print('ERROR !')
         print('You should create "/home/decontamine" directory to store the logs and the conf file !')
         exit(1)
 
-    print("\x1b[2J\x1b[H",end="") # clear
+    print("\x1b[2J\x1b[H", end="") # clear
     # colored('install', 'red', attrs=['bold', 'reverse'])
-    projectName = 'Decontamine Linux'
-    projectDescription = 'Analyzing and cleaning station:'
+    project_name = 'Decontamine Linux'
+    project_description = 'Analyzing and cleaning station:'
     compatibility = '   for optical drives, USB drives, etc.\n'
-    configPrint = 'Type "' + colored('C', 'red') + '" to enter the configurator'
-    exitPrint = 'Type "' + colored('E', 'red') + '" to exit program'
-    print('*'*len(projectName) + 20*('*'))
-    print('*'*10 + colored(projectName, attrs=['bold']) + 10*'*')
-    print('*'*len(projectName) + 20*('*'))
-    print(projectDescription)
+    config_print = 'Type "' + colored('C', 'red') + '" to enter the configurator'
+    exit_print = 'Type "' + colored('E', 'red') + '" to exit program'
+    print('*'*len(project_name) + 20*('*'))
+    print('*'*10 + colored(project_name, attrs=['bold']) + 10*'*')
+    print('*'*len(project_name) + 20*('*'))
+    print(project_description)
     print(compatibility)
-    print(configPrint)
-    print(exitPrint)
+    print(config_print)
+    print(exit_print)
     now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
     print("\nBegin: {d}".format(d=now) + '\n')
 
-    #Test if av or scan modules are present on the system and activated
-    res = config.init() #will exit program if no tools find
-    while res == -1 or res == False:
+    # Test if av or scan modules are present on the system and activated
+    res = config.init() # Will exit program if no tools find
+    while res in (-1, False):
         init()
     print(colored('Scanning tools activated : ', attrs=['underline']))
-    #Get a clean table of scanners activated
-    # columnLST = ['Name', 'Version']
-    commontools.createTable(res, 'Name', 'Version')
+    # Get a clean table of scanners activated
+    commontools.create_table(res, 'Name', 'Version')
 
-    #Print stats
-    nbScan, virusdetected, virusremoved = stats.stat(logDirectory)
-    if nbScan > 1:
-        print("\n" + colored(str(nbScan), 'yellow') + " devices have been scanned with success.")
-    if (nbScan > 1) and (virusdetected > 1):
-        phrase = "And " + colored(str(virusdetected), 'yellow') + " viruses have been detected !"
-        if virusremoved > 1:
-            phrase = phrase + " ( " + colored(str(virusremoved), 'yellow') + " removed !)\n"
+    # Print stats
+    nb_scan, virus_detected, virus_removed = stats.stat(LOG_DIRECTORY)
+    if nb_scan > 1:
+        print("\n" + colored(str(nb_scan), 'yellow') + " devices have been scanned with success.")
+    if (nb_scan > 1) and (virus_detected > 1):
+        phrase = "And " + colored(str(virus_detected), 'yellow') + " viruses have been detected !"
+        if virus_removed > 1:
+            phrase = phrase + " ( " + colored(str(virus_removed), 'yellow') + " removed !)\n"
         print(phrase)
 
     while True:
@@ -100,88 +94,88 @@ def init():
         while chosen == 0:
             rep = commontools.mykbhit()
             if rep in ['c', 'C']:   # Enter config mode
-                print("\x1b[2J\x1b[H",end="") # clear
-                rep = config.configurator(avcompatibleDict)
+                print("\x1b[2J\x1b[H", end="") # clear
+                rep = config.configurator()
                 init()
             if rep in ['e', 'E']:   # Exit
                 exit(1)
 
-            chosen, deviceDict = testPreAnalyse.init() # Will not take any user input during the test
-        # print(chosen, deviceDict)
+            chosen, device_dict = testpreanalyse.init() # Will not take any user input during the test
+        # print(chosen, device_dict)
 
         # Get device attributs
-        label, mountpoint, readonly = testPreAnalyse.depackedDeviceDict(deviceDict)
+        label, mount_pts, read_only = testpreanalyse.depack_device(device_dict)
 
-        if mountpoint != '':
-            logFilePath1 = logDirectory + 'LOGS/{}'.format(datetime.now().strftime('%Y/%m/%d'))
-            logFilePath1 += '/' + datetime.now().strftime("%d%m%y%H%M%S")
-            logFilePath = logFilePath1+"Log.txt"
+        if mount_pts != '':
+            log_file_path = LOG_DIRECTORY + 'LOGS/{}'.format(datetime.now().strftime('%Y/%m/%d'))
+            log_file_path += '/' + datetime.now().strftime("%d%m%y%H%M%S")
+            log_file = log_file_path + "Log.txt"
 
             print('\n' + '_'*30 + '\n')
             print('Device {} detected'.format(label))
-            if readonly == 1:
+            if read_only == 1:
                 print('\n {} is read-only, '.format(label) + colored('it will be impossible to remove viruses !', attrs=['bold']))
 
-            element1 = "-------------------------Device scanned : ''"+str(label)+"'' --------------\n"
-            element1b = "-------------------------Read-only : "+str(readonly)+" --------------\n"
-            element1c = "-------------------------Station : ''"+os.uname()[1]+"'' --------------\n"
-            element2 = "-------------------------"+str(datetime.now().strftime("%A %d %B %Y %H:%M:%S"))+"--------------\n"
-            element = element1+element1b+element1c+element2
-            logManagement.writeLog(logFilePath, element, 'utf-8')#write logfile
+            element1 = "-------------------------Device scanned : ''"+str(label) + "'' --------------\n"
+            element1b = "-------------------------Read-only : " + str(read_only) + " --------------\n"
+            element1c = "-------------------------Station : ''" + os.uname()[1] + "'' --------------\n"
+            element2 = "-------------------------" + str(datetime.now().strftime("%A %d %B %Y %H:%M:%S")) + "--------------\n"
+            element = element1 + element1b + element1c + element2
+            logmanagement.writelog(log_file, element, 'utf-8')#write log_file
 
             # Get files
             test = 1
             while test < 30:
-                beginScan = time.time()
-                filesLst = testPreAnalyse.getFiles(mountpoint)
-                if len(filesLst) > 0:
-                    # print(filesLst)
-                    filePrint = '{} files to analyze on the device "{}"'.format(len(filesLst), label)
-                    print(colored(str(len(filesLst)), 'yellow') + ' files to analyze on the device "{}"'.format(label))
-                    logManagement.writeLog(logFilePath, filePrint+'\n', 'utf-8')
-                    for files in filesLst:
-                        logManagement.writeLog(logFilePath, files+'\n', 'utf-8')
+                begin_scan = time.time()
+                files_list = testpreanalyse.get_files(mount_pts)
+                if len(files_list) > 0:
+                    # print(files_list)
+                    file_print = '{} files to analyze on the device "{}"'.format(len(files_list), label)
+                    print(colored(str(len(files_list)), 'yellow') + ' files to analyze on the device "{}"'.format(label))
+                    logmanagement.writelog(log_file, file_print+'\n', 'utf-8')
+                    for files in files_list:
+                        logmanagement.writelog(log_file, files+'\n', 'utf-8')
                     test = 30
                     break
                 if test == 29:#no files
                     print('No files to analyze on the device "{}"'.format(label))
                 time.sleep(0.5) #Let the time for the system to get the files
                 test += 1
-            if len(filesLst) > 0:
+            if len(files_list) > 0:
                 print('\nBeginning of the analyze, please wait !')
                 # 1 - init scanning tools
-                lstnotRM, lstrm, lstLogAV = analyze.init(res, mountpoint, readonly, logFilePath1)
+                not_rm_list, rm_list, log_av_list = analyze.init(res, mount_pts, read_only, log_file_path)
 
                 # 2 - print scan results
                 print('\n' + '_'*30 + '\n')
                 print(colored('Analyze is finished !', attrs=['bold']))
-                logFinalTemp = analyze.final(lstnotRM, lstrm, logFilePath1)
+                log_final_temp = analyze.final(not_rm_list, rm_list, log_file_path)
 
-                endScan = time.time()
-                totalTimeScan = endScan - beginScan
-                totalTime = 'Device analyzed in {} seconds.'.format(round(totalTimeScan, 5))
-                print('Device analyzed in ' + colored(str(round(totalTimeScan, 5)), 'yellow') + ' seconds.\n')
-                logManagement.writeLog(logFinalTemp, '\n'+totalTime, 'utf-8')
+                end_scan = time.time()
+                total_time_scan = end_scan - begin_scan
+                total_time = 'Device analyzed in {} seconds.'.format(round(total_time_scan, 5))
+                print('Device analyzed in ' + colored(str(round(total_time_scan, 5)), 'yellow') + ' seconds.\n')
+                logmanagement.writelog(log_final_temp, '\n' + total_time, 'utf-8')
 
                 # 3 - concat all logs in one final log
-                allLogs = []
-                allLogs = logManagement.concat(logFilePath, allLogs)
-                allLogs = logManagement.concat(lstLogAV, allLogs)
-                allLogs = logManagement.concat(logFinalTemp, allLogs)
-                # print(allLogs)
-                finalLog = os.path.dirname(logFilePath) + "/" + os.uname()[1] + "_FINAL-" + os.path.basename(logFilePath)
-                # print(finalLog)
-                logManagement.writeFinalLog(finalLog, allLogs)
+                all_logs = []
+                all_logs = logmanagement.concat(log_file, all_logs)
+                all_logs = logmanagement.concat(log_av_list, all_logs)
+                all_logs = logmanagement.concat(log_final_temp, all_logs)
+                # print(all_logs)
+                final_log = os.path.dirname(log_file) + "/" + os.uname()[1] + "_FINAL-" + os.path.basename(log_file)
+                # print(final_log)
+                logmanagement.write_final_log(final_log, all_logs)
 
                 # 4 - Prompt the user to read the detail of the final result
-                logManagement.readLog(finalLog)
+                logmanagement.readlog(final_log)
 
                 # 5 - Prompt the user to get a copy of the final result
-                if readonly == 0:
-                    logManagement.getLog(finalLog, mountpoint)
+                if read_only == 0:
+                    logmanagement.getlog(final_log, mount_pts)
 
                 # 6 - Prompt the user to dismount and take back his device
-                dismount(mountpoint)
+                dismount(mount_pts)
 
                 # 7 - Reload the process
                 init()

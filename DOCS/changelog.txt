@@ -1,4 +1,23 @@
 CHANGELOG
+05/01/2020 - 09/01/2020
+    Modules static analysis (# pylint3 --disable=line-too-long) + code cleaning
+        main.py                 9.60/10
+        analyze.py              9.82/10
+        config.py               9.79/10
+        commontools.py          9.74/10
+        logmanagement.py        9.46/10
+        stats.py                9.55/10
+        kbhitClass.py           N/A
+        testpreanalyse.py       9.37/10
+        tools_scripts/
+            clamav.py           9.67/10
+            f-secure.py         9.62/10
+            sophos.py           9.67/10
+    Remove extractSTR() function from logManagement.py module
+    Remove replacer() function from logManagement.py module
+    Rename modules, functions, variables, etc. according PEP8 convention
+    Add function compare_virus() in commontools to simplify get_virus() in clamav, f-secure and sophos
+
 27/12/2019
     Correct a bug in config.py module in getConfInfos()
     Resolve issue #10 - Devices with no label (no name) are not detected

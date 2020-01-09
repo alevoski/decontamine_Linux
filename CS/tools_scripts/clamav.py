@@ -1,67 +1,59 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - clamav.py
-#@Alexandre Buissé - 2018
+#@Alexandre Buissé - 2018/2020
 
 #Standard imports
 import subprocess
 import re
 
 #Project modules imports
-from commontools import prompter, startPROC, statusPROC, waitandcheck
-from logManagement import writeLog
+from commontools import prompter, start_proc, status_proc, wait_and_check, compare_virus
+from logmanagement import writelog
 
 
-def init(mountPts, readOnly, logDirectory):
+def init(mount_pts, read_only, log_file_path):
     '''
     Init scan with ClamAV
     '''
-    logFile = logDirectory + 'tempClamAV'
-    writeLog(logFile, '\n*****Scan with ClamAV - begin*****\n', 'utf-8')
-    statusCode = scan(mountPts, readOnly, logFile)
-    endingSentence = '*****Scan with ClamAV - finish*****\n'
-    if statusCode == -15:
-        endingSentence = '*****Scan with ClamAV has been stopped*****\n'
-    writeLog(logFile, endingSentence, 'utf-8')
-    if statusCode == 1 or statusCode == -15:
-        virusDict = getVirus(logFile)
-        # print(virusDict)
-        return statusCode, virusDict, logFile
-    return statusCode, 0, logFile
+    log_file = log_file_path + 'tempClamAV'
+    writelog(log_file, '\n*****Scan with ClamAV - begin*****\n', 'utf-8')
+    status_code = scan(mount_pts, read_only, log_file)
+    ending_sentence = '*****Scan with ClamAV - finish*****\n'
+    if status_code == -15:
+        ending_sentence = '*****Scan with ClamAV has been stopped*****\n'
+    writelog(log_file, ending_sentence, 'utf-8')
+    if status_code in (1, -15):
+        virus_dict = get_virus(log_file)
+        # print(virus_dict)
+        return status_code, virus_dict, log_file
+    return status_code, 0, log_file
 
-def getVirus(logFile):
+def get_virus(log_file):
     '''
     Get virus dict
     '''
-    f = open(logFile, mode='r', encoding='utf-8')
-    virusFound = {}
-    virusTEMP = {}
-    virusName = ''
-    virusType = ''
-    lstRemoved = []
-    for line in f:
-        if 'FOUND' in line:
-            virusName = re.findall('(.*):', str(line))
-            virusType = re.findall(':(.*)FOUND', str(line))
-            virusTEMP[virusName[0]] = virusType[0]
-        if 'Removed' in line:
-            # print('rm : ', line)
-            removedVirus = re.findall('(.*):', str(line))
-            # print(removedVirus)
-            lstRemoved.append(removedVirus[0])
+    virus_temp_dict = {}
+    virus_name = ''
+    virus_type = ''
+    removed_list = []
+    with open(log_file, mode='r', encoding='utf-8') as log:
+        for line in log:
+            if 'FOUND' in line:
+                virus_name = re.findall('(.*):', str(line))
+                virus_type = re.findall(':(.*)FOUND', str(line))
+                virus_temp_dict[virus_name[0]] = virus_type[0]
+            if 'Removed' in line:
+                # print('rm : ', line)
+                removed_virus = re.findall('(.*):', str(line))
+                # print(removed_virus)
+                removed_list.append(removed_virus[0])
 
-    #Compare lstRemoved with virusTEMP:
-    # print(lstRemoved)
-    for k, v in virusTEMP.items():
-        # print(k)
-        removed = 0
-        if k in lstRemoved:
-            removed = 1
-            # print('rm ok')
-        virusFound[k] = {'type':str(v), 'removed':removed}
-    return virusFound
+    # Compare removed_list with virus_temp_dict:
+    virus_dict = compare_virus(removed_list, virus_temp_dict)
+    return virus_dict
 
-def scan(mountPts, readOnly, logFile):
+def scan(mount_pts, read_only, log_file):
     '''
     Scan the mounting point in parameters.
     Return
@@ -71,34 +63,27 @@ def scan(mountPts, readOnly, logFile):
             2 : Error
             -15 : Scan stopped by user
     '''
-    cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--fdpass', '-l', logFile, mountPts]
-    if not readOnly:
+    cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--fdpass', '-l', log_file, mount_pts]
+    if not read_only:
         #Ask user if he wants av to autoclean the device
         rep = prompter('Do you want to automaticly clean the device ? (y/n)')
         if 'y' in str(rep):
-            cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--remove', '--fdpass', '-l', logFile, mountPts]
+            cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--remove', '--fdpass', '-l', log_file, mount_pts]
         elif 'n' in str(rep):
             pass
     print('Scan begin')
     try:
-        # res = str(subprocess.check_output(cmdline), 'utf-8')
-        
-        #print(res)
-        # p = re.findall('Infected files:*?(\d+)', str(res))
-        # return 0
         print("Press 's' to stop the scan")
-        procID = startPROC(cmdline, 1)
-        procStatus = statusPROC(procID)
-        # print('status', procStatus)
-        waitandcheck(procStatus, procID)
-        procStatus = statusPROC(procID)
-        # print('status', procStatus)
-        return procStatus
-        
-    except subprocess.CalledProcessError as e:#Error
-        p = re.findall(r'exit status.*?(\d+)', str(e))
-
-    return int(p[0])
+        proc_id = start_proc(cmdline, 1)
+        proc_status = status_proc(proc_id)
+        # print('status', proc_status)
+        wait_and_check(proc_status, proc_id)
+        proc_status = status_proc(proc_id)
+        # print('status', proc_status)
+        return proc_status
+    except subprocess.CalledProcessError as exception: # Error
+        proc_status = re.findall(r'exit status.*?(\d+)', str(exception))
+    return int(proc_status[0])
 
 def version():
     '''

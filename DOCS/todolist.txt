@@ -22,6 +22,8 @@ Bonus
     Send stats to web server
 
 Top priorities
+    Decrease calcul duration of file numbers
+    File dict {'path', 'type'} instead of list ?
     Analyze with Kaspersky (https://support.kaspersky.com/kes10linux#downloads) 
     Analyze with F-Prot (http://www.f-prot.com/download/home_user/download_fplinux.html) 
     Analyze with Fortinet (https://forticlient.com/downloads) 

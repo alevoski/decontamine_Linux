@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - commontools.py
-#@Alexandre Buissé - 2018
+#@Alexandre Buissé - 2018/2020
 
 #Standard imports
 import re
-import getch
 import subprocess
+import getch
 from termcolor import colored
 
 #Project modules imports
@@ -23,78 +23,79 @@ def mykbhit():
     '''
     Detect a key press by user
     '''
-    kb = kbhitClass.KBHit()
+    kbinput = kbhitClass.KBHit()
 
     # print('Hit any key, or ESC to exit')
 
     test = 1
     while test < 15000:
         # print(test)
-        if kb.kbhit():
-            c = kb.getch()
-            # print(c)
-            return c
+        if kbinput.kbhit():
+            char = kbinput.getch()
+            # print(char)
+            return char
         test += 1
 
-def createTable(theDict, column1, column2):
+def create_table(the_dict, column1, column2):
     '''
     Create a table
     '''
-
     max1 = 0
     max2 = 0
 
-    for item, value in theDict.items():
+    for item, value in the_dict.items():
         # max len()
         if len(item) > max1:
             max1 = len(item)
         if len(value) > max2:
             max2 = len(value)
 
-    #Table headers
-    diffMax1 = max1-len(column1)
-    max1Header = column1+" "*diffMax1+"| "
+    # Table headers
+    diff_max1 = max1-len(column1)
+    max1_header = column1 + " " * diff_max1 + "| "
 
-    diffMax2 = max2-len(column2)
-    max2Header = column2+" "*diffMax2+"|"
+    diff_max2 = max2-len(column2)
+    max2_header = column2 + " " * diff_max2 + "|"
 
-    header = max1Header + max2Header
-    limHeader = "-"*max1 + "-"*max2
+    header = max1_header + max2_header
+    lim_header = "-" * max1 + "-" * max2
     print(colored(header, attrs=['bold']))
-    print(limHeader)
+    print(lim_header)
 
-    #Table values
-    for item, value in theDict.items():
+    # Table values
+    for item, value in the_dict.items():
         # print(item)
-        diffMax1 = max1-len(item)
-        theItem = item +" "*diffMax1
+        diff_max1 = max1-len(item)
+        the_item = item +" "*diff_max1
 
-        diffMax2 = max2-len(value)
-        theValue = value +" "*diffMax2
+        diff_max2 = max2-len(value)
+        the_value = value +" "*diff_max2
 
-        print(colored(theItem, 'green') + "|" + colored(theValue, 'magenta'))
+        print(colored(the_item, 'green') + "|" + colored(the_value, 'magenta'))
 
-def extractNumber(line):
-    '''Extract number dans rapport'''
+def extract_number(line):
+    '''
+    Extract number in string
+    '''
     try:
-        p = re.search('[0-9]+', line)
-        # print(repr(line), repr(p.group(0)))
-        return int(p.group(0))
+        num = re.search('[0-9]+', line)
+        # print(repr(line), repr(num.group(0)))
+        return int(num.group(0))
     except Exception:
         return 0
 
-def prompter(toAsk):
+def prompter(question):
     '''
     Prompt user, return the answer
     '''
     while True:
-        print(toAsk)
+        print(question)
         rep = str(getch.getch())
         if rep in ['y', 'n']:
             break
     return rep
 
-def startPROC(procname, mode, fwrite=''):
+def start_proc(procname, mode, fwrite=''):
     '''
     Start a process and return its process id
     '''
@@ -106,13 +107,13 @@ def startPROC(procname, mode, fwrite=''):
         proc = subprocess.check_output([procname]) # Blocking call
     return proc
 
-def statusPROC(proc):
+def status_proc(proc):
     '''
     Return process status code
     '''
     return proc.poll()
 
-def stopPROC(proc):
+def stop_proc(proc):
     '''
     Kill a process and wait until it terminate
     '''
@@ -120,16 +121,30 @@ def stopPROC(proc):
     proc.terminate()
     proc.wait()
 
-def waitandcheck(procStatus, procID):
+def wait_and_check(proc_status, proc_id):
     '''
     Wait for process to terminate itself
     Meanwhile, check if user wants to stop process
     '''
-    while procStatus == None:
-        procStatus = statusPROC(procID)
-        if procStatus != None:
+    while proc_status is None:
+        proc_status = status_proc(proc_id)
+        if proc_status is not None:
             break
         if mykbhit() in ['s', 'S']:
-            stopPROC(procID)
+            stop_proc(proc_id)
+
+def compare_virus(removed_list, virus_temp_dict):
+    '''
+    Compare removed_list with virus_temp_dict
+    '''
+    virus_dict = {}
+    for virus_name, virus_type in virus_temp_dict.items():
+        # print(virus_name)
+        removed = 0
+        if virus_name in removed_list:
+            removed = 1
+            # print('rm ok')
+        virus_dict[virus_name] = {'type':str(virus_type), 'removed':removed}
+    return virus_dict
 
 #https://repolinux.wordpress.com/2012/10/09/non-blocking-read-from-stdin-in-python/

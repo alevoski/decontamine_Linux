@@ -1,76 +1,64 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 #Decontamine Linux - sophos.py
-#@Alexandre Buissé - 2018
+#@Alexandre Buissé - 2018/2020
 
 #Standard imports
 import subprocess
 import re
 
 #Project modules imports
-from commontools import startPROC, statusPROC, waitandcheck
-from logManagement import writeLog, deleter, writeFirstLine
+from commontools import start_proc, status_proc, wait_and_check, compare_virus
+from logmanagement import writelog, deleter, write_first_line
 
-def init(mountPts, readOnly, logDirectory):
+def init(mount_pts, read_only, log_file_path):
     '''
     Init scan with Sophos
     '''
-    logFile = logDirectory + 'tempSophosAV'
-    statusCode = scan(mountPts, readOnly, logFile)
-    writeFirstLine(logFile, '\n*****Scan with Sophos - begin*****\n')
-    endingSentence = '*****Scan with Sophos - finish*****\n'
+    log_file = log_file_path + 'tempSophosAV'
+    status_code = scan(mount_pts, read_only, log_file)
+    write_first_line(log_file, '\n*****Scan with Sophos - begin*****\n')
+    ending_sentence = '*****Scan with Sophos - finish*****\n'
 
     # Clean the log of not usefull informations
-    deleter(logFile, 'Using IDE file')
-    
-    if statusCode == 1:
-        statusCode = -15 # Change with a commonly shared status code
-        endingSentence = '*****Scan with Sophos has been stopped*****\n'
-    writeLog(logFile, endingSentence, 'utf-8')
-    
-    if statusCode == 3 or statusCode == -15:
-        virusDict = getVirus(logFile)
-        # print(virusDict)
-        return statusCode, virusDict, logFile
-    return statusCode, 0, logFile
+    deleter(log_file, 'Using IDE file')
 
-def getVirus(logFile):
+    if status_code == 1:
+        status_code = -15 # Change with a commonly shared status code
+        ending_sentence = '*****Scan with Sophos has been stopped*****\n'
+    writelog(log_file, ending_sentence, 'utf-8')
+
+    if status_code in (3, -15):
+        virus_dict = get_virus(log_file)
+        # print(virus_dict)
+        return status_code, virus_dict, log_file
+    return status_code, 0, log_file
+
+def get_virus(log_file):
     '''
     Get virus dict
     '''
-    f = open(logFile, mode='r', encoding='utf-8')
-    virusFound = {}
-    virusTEMP = {}
-    virusName = ''
-    virusType = ''
-    lstRemoved = []
-    for line in f:
-        if '>>> Virus' in line:
-            virusName = re.findall('file (.*)', str(line))
-            virusType = re.findall("'(.*)'", str(line))
-            # print(virusName, virusType)
-            virusTEMP[virusName[0]] = virusType[0]
-        if 'Removal successful' in line:
-            # print('rm : ', line)
-            # removedVirus = re.findall('file (.*)', str(line))
-            # print(removedVirus)
-            lstRemoved.append(virusName[0])
+    virus_temp_dict = {}
+    virus_name = ''
+    virus_type = ''
+    removed_list = []
+    with open(log_file, mode='r', encoding='utf-8') as log:
+        for line in log:
+            if '>>> Virus' in line:
+                virus_name = re.findall('file (.*)', str(line))
+                virus_type = re.findall("'(.*)'", str(line))
+                virus_temp_dict[virus_name[0]] = virus_type[0]
+            if 'Removal successful' in line:
+                # print('rm : ', line)
+                # removed_virus = re.findall('file (.*)', str(line))
+                # print(removed_virus)
+                removed_list.append(virus_name[0])
 
-    #Compare lstRemoved with virusTEMP:
-    # print('Sophos - virus detected\n')
-    # print(virusTEMP)
-    # print('Sophos - virus removed\n')
-    # print(lstRemoved)
-    for k, v in virusTEMP.items():
-        # print(k)
-        removed = 0
-        if k in lstRemoved:
-            removed = 1
-            # print('rm ok')
-        virusFound[k] = {'type':str(v), 'removed':removed}
-    return virusFound
+    # Compare removed_list with virus_temp_dict:
+    virus_dict = compare_virus(removed_list, virus_temp_dict)
+    return virus_dict
 
-def scan(mountPts, readOnly, logFile):
+def scan(mount_pts, read_only, log_file):
     '''
     Scan the mounting point in parameters.
     Return
@@ -80,9 +68,9 @@ def scan(mountPts, readOnly, logFile):
             2 : Errors encounter
             3 : Virus found
     '''
-    cmdline = ['/usr/local/bin/savscan', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', '--no-reset-atime', mountPts, '-p='+ logFile]
-    if not readOnly:
-        cmdline = ['/usr/local/bin/savscan', '-remove', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', '--no-reset-atime', mountPts, '-p=' + logFile]
+    cmdline = ['/usr/local/bin/savscan', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', '--no-reset-atime', mount_pts, '-p='+ log_file]
+    if not read_only:
+        cmdline = ['/usr/local/bin/savscan', '-remove', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', '--no-reset-atime', mount_pts, '-p=' + log_file]
     print('Scan begin')
     try:
         # res = str(subprocess.check_output(cmdline), 'utf-8')
@@ -90,22 +78,16 @@ def scan(mountPts, readOnly, logFile):
         # p = re.findall('Infected files:*?(\d+)', str(res))
         # return 0
         print("Press 's' to stop the scan")
-        procID = startPROC(cmdline, 1)
-        procStatus = statusPROC(procID)
-        # print('status', procStatus)
-        waitandcheck(procStatus, procID)
-        procStatus = statusPROC(procID)
-        # print('status sophos', procStatus)
-        return procStatus
-        
-    except subprocess.CalledProcessError as e:#Error
-        # print(e)
-        p = re.findall(r'exit status.*?(\d+)', str(e))
-        # print(p)
-        # print(int(p[0]))
-        # print(type(p[0]))
-
-    return int(p[0])
+        proc_id = start_proc(cmdline, 1)
+        proc_status = status_proc(proc_id)
+        # print('status', proc_status)
+        wait_and_check(proc_status, proc_id)
+        proc_status = status_proc(proc_id)
+        # print('status sophos', proc_status)
+        return proc_status
+    except subprocess.CalledProcessError as exception:#Error
+        proc_status = re.findall(r'exit status.*?(\d+)', str(exception))
+    return int(proc_status[0])
 
 def version():
     '''
