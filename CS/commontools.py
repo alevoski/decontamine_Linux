@@ -95,7 +95,7 @@ def prompter(question):
             break
     return rep
 
-def start_proc(procname, mode, fwrite=''):
+def start_proc(procname, mode, fwrite=subprocess.DEVNULL):
     '''
     Start a process and return its process id
     '''
@@ -121,7 +121,7 @@ def stop_proc(proc):
     proc.terminate()
     proc.wait()
 
-def wait_and_check(proc_status, proc_id):
+def wait_and_checkOLD(proc_status, proc_id):
     '''
     Wait for process to terminate itself
     Meanwhile, check if user wants to stop process
@@ -132,7 +132,35 @@ def wait_and_check(proc_status, proc_id):
             break
         if mykbhit() in ['s', 'S']:
             stop_proc(proc_id)
-
+            
+            
+def wait_and_check(proc_status, proc_id):
+    '''
+    Wait for process to terminate itself
+    Meanwhile, check if user wants to stop process
+    '''
+    code = 0
+    while proc_status is None:
+        proc_status = status_proc(proc_id)
+        if proc_status is not None:
+            break
+        if mykbhit() in ['s', 'S']:
+            print('Stop requested')
+            # stop_proc(proc_id)
+            code = -15
+            break
+    return code
+    
+def stop_all(proc_dict):
+    # import psutil
+    for proc_id, _ in proc_dict.items():
+        # process = psutil.Process(proc_id.pid)
+        proc_status = status_proc(proc_id)
+        # print(process.name, proc_status)
+        if proc_status is None:
+            # print(str(process.name) + ' will be terminated')
+            stop_proc(proc_id)
+    
 def compare_virus(removed_list, virus_temp_dict):
     '''
     Compare removed_list with virus_temp_dict

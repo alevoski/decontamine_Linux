@@ -304,9 +304,9 @@ def chose_device(obj_dict, chosen):
 
     return device_dict
 
-def get_files(media):
+def get_filesOLD(media):
     '''
-    Get files of the device selected, return filesLst
+    Get files of the device selected, return files_list
     '''
     files_list = []
     for root_dir, _, files in os.walk(media):
@@ -315,6 +315,21 @@ def get_files(media):
             if 'System Volume Information' not in root_dir:
                 # print(os.path.join(root_dir, filename))
                 files_list.append(os.path.join(root_dir, filename))
+    return files_list
+
+def get_files(media, files_list=[]):
+    '''
+    Get files of the device selected, return files_list
+    '''
+    for elems in os.scandir(media):
+        if 'System Volume Information' not in media:
+            try:
+                if elems.is_dir(follow_symlinks=False):
+                    get_files(elems.path, files_list)
+                else:
+                    files_list.append(os.path.join(elems.path, elems.name))
+            except PermissionError:
+                pass
     return files_list
 
 def depack_device(device_dict):

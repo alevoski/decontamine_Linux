@@ -1,4 +1,17 @@
 CHANGELOG
+16/01/2020 - 23/01/2020
+    Changes in tool_scripts and analyze modules 
+        manage multithreading : tools scan at the same time
+        tools will not remove virus
+        ask user to remove virus at the end of all scans : os.remove()
+        correction in the cmdline of scan() in sophos.py
+            Will now do quick scanning
+            Remove a duplicate parameter "--no-reset-atime"
+        If viruses have been detected, they will be show on a table (with tabular module)
+        Remove result() from analyze module
+        final() from analyze rename in final_result()
+    Replace os.walk() by os.scandir() in get_files() in testpreanalyse to gain time
+
 05/01/2020 - 09/01/2020
     Modules static analysis (# pylint3 --disable=line-too-long) + code cleaning
         main.py                 9.60/10

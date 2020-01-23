@@ -70,12 +70,12 @@ def init():
     print("\nBegin: {d}".format(d=now) + '\n')
 
     # Test if av or scan modules are present on the system and activated
-    res = config.init() # Will exit program if no tools find
-    while res in (-1, False):
+    tools_dict = config.init() # Will exit program if no tools find
+    while tools_dict in (-1, False):
         init()
     print(colored('Scanning tools activated : ', attrs=['underline']))
     # Get a clean table of scanners activated
-    commontools.create_table(res, 'Name', 'Version')
+    commontools.create_table(tools_dict, 'Name', 'Version')
 
     # Print stats
     nb_scan, virus_detected, virus_removed = stats.stat(LOG_DIRECTORY)
@@ -132,32 +132,42 @@ def init():
                     # print(files_list)
                     file_print = '{} files to analyze on the device "{}"'.format(len(files_list), label)
                     print(colored(str(len(files_list)), 'yellow') + ' files to analyze on the device "{}"'.format(label))
-                    logmanagement.writelog(log_file, file_print+'\n', 'utf-8')
+                    logmanagement.writelog(log_file, file_print + '\n', 'utf-8')
                     for files in files_list:
-                        logmanagement.writelog(log_file, files+'\n', 'utf-8')
+                        logmanagement.writelog(log_file, files + '\n', 'utf-8')
                     test = 30
                     break
-                if test == 29:#no files
+                if test == 29:# No files
                     print('No files to analyze on the device "{}"'.format(label))
-                time.sleep(0.5) #Let the time for the system to get the files
+                time.sleep(0.5) # Let the time for the system to get the files
                 test += 1
             if len(files_list) > 0:
                 print('\nBeginning of the analyze, please wait !')
-                # 1 - init scanning tools
-                not_rm_list, rm_list, log_av_list = analyze.init(res, mount_pts, read_only, log_file_path)
+                # 1 - Launch scanning tools
+                detection_dict, log_av_list = analyze.init(tools_dict, mount_pts, log_file_path)
 
-                # 2 - print scan results
+                # 2 - Print scan results
                 print('\n' + '_'*30 + '\n')
                 print(colored('Analyze is finished !', attrs=['bold']))
-                log_final_temp = analyze.final(not_rm_list, rm_list, log_file_path)
+                # log_final_temp = analyze.final(not_rm_list, rm_list, log_file_path)
 
                 end_scan = time.time()
                 total_time_scan = end_scan - begin_scan
                 total_time = 'Device analyzed in {} seconds.'.format(round(total_time_scan, 5))
-                print('Device analyzed in ' + colored(str(round(total_time_scan, 5)), 'yellow') + ' seconds.\n')
-                logmanagement.writelog(log_final_temp, '\n' + total_time, 'utf-8')
+                print('Device analyzed in ' + colored(str(round(total_time_scan, 5)), 'yellow') + ' seconds.\n') 
 
-                # 3 - concat all logs in one final log
+                code = analyze.show_result(detection_dict, tools_dict)
+                log_final_temp = log_file_path + 'tempRes'
+                logmanagement.writelog(log_final_temp, '\n' + total_time + '\n', 'utf-8')
+
+                # 3 - Ask user to remove viruses
+                if read_only == 0:
+                    rm_list = []
+                    if code == 1:
+                        rm_list = analyze.rm_virus(detection_dict)
+                    analyze.final_result(detection_dict, tools_dict, rm_list, log_final_temp)
+
+                # 4 - concat all logs in one final log
                 all_logs = []
                 all_logs = logmanagement.concat(log_file, all_logs)
                 all_logs = logmanagement.concat(log_av_list, all_logs)
@@ -166,18 +176,20 @@ def init():
                 final_log = os.path.dirname(log_file) + "/" + os.uname()[1] + "_FINAL-" + os.path.basename(log_file)
                 # print(final_log)
                 logmanagement.write_final_log(final_log, all_logs)
+                # Clean the log of not usefull informations
+                logmanagement.deleter(final_log, 'Using IDE file')
 
-                # 4 - Prompt the user to read the detail of the final result
+                # 5 - Prompt the user to read the detail of the final result
                 logmanagement.readlog(final_log)
 
-                # 5 - Prompt the user to get a copy of the final result
+                #6 - Prompt the user to get a copy of the final result
                 if read_only == 0:
                     logmanagement.getlog(final_log, mount_pts)
 
-                # 6 - Prompt the user to dismount and take back his device
+                # 7 - Prompt the user to dismount and take back his device
                 dismount(mount_pts)
 
-                # 7 - Reload the process
+                # 8 - Reload the process
                 init()
 
 if __name__ == '__main__':
