@@ -7,7 +7,7 @@ CHANGELOG
         correction in the cmdline of scan() in sophos.py
             Will now do quick scanning
             Remove a duplicate parameter "--no-reset-atime"
-        If viruses have been detected, they will be show on a table (with tabular module)
+        If viruses have been detected, they will be show on a table (with tabulate module)
         Remove result() from analyze module
         final() from analyze rename in final_result()
     Replace os.walk() by os.scandir() in get_files() in testpreanalyse to gain time
