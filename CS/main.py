@@ -9,8 +9,11 @@ import time
 import os
 import subprocess
 from sys import exit
+
+#Third party imports
 import getch
 from termcolor import colored
+from tabulate import tabulate
 
 #Project modules imports
 import stats
@@ -26,7 +29,7 @@ def dismount(mount_pts):
     '''
     Prompt the user to dismount and take back his device
     '''
-    rep = commontools.prompter('Do you want to eject and get back your device ? (y/n)')
+    rep = commontools.prompter('Do you want to eject and get back your device ? (y/n)', ['y', 'Y', 'n', 'N'])
     if rep in ['y', 'Y']:
         if subprocess.call(['/bin/umount', str(mount_pts)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
             print('Success to umount your device !')
@@ -37,6 +40,16 @@ def dismount(mount_pts):
             pass
     elif rep in ['n', 'N']:
         pass
+
+def create_table(tools_dict):
+    '''
+    Create a table
+    '''
+    table = []
+    for name, value in tools_dict.items():
+        version = value['version']
+        table.append([colored(name, 'green'), colored(version, 'magenta')])
+    print(tabulate(table, headers=[colored('Name', attrs=['bold']), colored('Version', attrs=['bold'])]))
 
 def init():
     '''
@@ -75,7 +88,7 @@ def init():
         init()
     print(colored('Scanning tools activated : ', attrs=['underline']))
     # Get a clean table of scanners activated
-    commontools.create_table(tools_dict, 'Name', 'Version')
+    create_table(tools_dict)
 
     # Print stats
     nb_scan, virus_detected, virus_removed = stats.stat(LOG_DIRECTORY)
@@ -127,7 +140,7 @@ def init():
             test = 1
             while test < 30:
                 begin_scan = time.time()
-                files_list = testpreanalyse.get_files(mount_pts)
+                files_list = testpreanalyse.get_files(mount_pts, [])
                 if len(files_list) > 0:
                     # print(files_list)
                     file_print = '{} files to analyze on the device "{}"'.format(len(files_list), label)
@@ -149,23 +162,22 @@ def init():
                 # 2 - Print scan results
                 print('\n' + '_'*30 + '\n')
                 print(colored('Analyze is finished !', attrs=['bold']))
-                # log_final_temp = analyze.final(not_rm_list, rm_list, log_file_path)
 
                 end_scan = time.time()
                 total_time_scan = end_scan - begin_scan
                 total_time = 'Device analyzed in {} seconds.'.format(round(total_time_scan, 5))
-                print('Device analyzed in ' + colored(str(round(total_time_scan, 5)), 'yellow') + ' seconds.\n') 
+                print('Device analyzed in ' + colored(str(round(total_time_scan, 5)), 'yellow') + ' seconds.\n')
 
                 code = analyze.show_result(detection_dict, tools_dict)
                 log_final_temp = log_file_path + 'tempRes'
                 logmanagement.writelog(log_final_temp, '\n' + total_time + '\n', 'utf-8')
 
                 # 3 - Ask user to remove viruses
+                rm_list = []
                 if read_only == 0:
-                    rm_list = []
                     if code == 1:
                         rm_list = analyze.rm_virus(detection_dict)
-                    analyze.final_result(detection_dict, tools_dict, rm_list, log_final_temp)
+                analyze.final_result(detection_dict, tools_dict, rm_list, log_final_temp)
 
                 # 4 - concat all logs in one final log
                 all_logs = []

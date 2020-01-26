@@ -3,27 +3,16 @@
 #Decontamine Linux - sophos.py
 #@Alexandre Buissé - 2018/2020
 
+'''
+Scanning module : Sophos antivirus
+'''
+
 #Standard imports
 import subprocess
 import re
 
 #Project modules imports
 from commontools import start_proc
-
-def get_virus(log_file):
-    '''
-    Get virus dict
-    '''
-    virus_temp_dict = {}
-    virus_name = ''
-    virus_type = ''
-    with open(log_file, mode='r', encoding='utf-8') as log:
-        for line in log:
-            if '>>> Virus' in line:
-                virus_name = re.findall('file (.*)', str(line))
-                virus_type = re.findall("'(.*)'", str(line))
-                virus_temp_dict[virus_name[0]] = virus_type[0]
-    return virus_temp_dict
 
 def scan(mount_pts, log_file):
     '''

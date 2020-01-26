@@ -1,4 +1,24 @@
 CHANGELOG
+26/01/2020
+    Modules static analysis (# pylint3 --disable=line-too-long) + code cleaning and minor corrections
+        main.py                 9.64/10
+        analyze.py              9.74/10
+        config.py               9.87/10
+        commontools.py          9.82/10
+        logmanagement.py        9.45/10
+        stats.py                9.30/10
+        kbhitClass.py           N/A
+        testpreanalyse.py       9.38/10
+        tools_scripts/
+            clamav.py           10/10
+            f-secure.py         9.50/10
+            sophos.py           10/10
+    Option to remove all viruses detected at the end of the scan (quicker than one by one)
+    Use tabulate to show the tools table : move create_table() from commontools to main module
+    Delete not used functions()
+    Move extract_number() from commontools to stats module
+    get_virus() is now a unique function in analyze module and common to tool_scripts
+
 16/01/2020 - 23/01/2020
     Changes in tool_scripts and analyze modules 
         manage multithreading : tools scan at the same time

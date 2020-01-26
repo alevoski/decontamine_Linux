@@ -9,6 +9,8 @@ import sys
 from configparser import ConfigParser
 from datetime import datetime
 import subprocess
+
+#Third party imports
 import getch
 from termcolor import colored
 
@@ -17,9 +19,22 @@ from commontools import import_from
 
 CFG_FILE = "/home/decontamine/decontamine.cfg"
 
-AV_COMPATIBLE_DICT = {'ClamAV':'clamdscan',
-                      'Sophos':'savscan',
-                      'F-Secure':'fsav'}
+AV_COMPATIBLE_DICT = {
+    'ClamAV':{
+        'cmd':'clamdscan',
+        'found_pattern':'FOUND',
+        'name_pattern':'(.*):',
+        'type_pattern':':(.*)FOUND'},
+    'Sophos':{
+        'cmd':'savscan',
+        'found_pattern':'>>> Virus',
+        'name_pattern':'file (.*)',
+        'type_pattern':"'(.*)'"},
+    'F-Secure':{
+        'cmd':'fsav',
+        'found_pattern':'Infected:',
+        'name_pattern':'(.*): Infected',
+        'type_pattern':'Infected: (.*)'}}
 
 TOOL_PATH = 'tools_scripts'
 # modulescompatibleDict = {}
@@ -36,8 +51,9 @@ def init():
     # presentModules = finder(modulescompatibleDict, 2)
     present_tools = present_av
     # print(present_tools)
+    # print(len(present_tools))
     # sys.exit()
-    if present_tools != []:
+    if len(present_tools) != 0:
         if os.path.isfile(CFG_FILE):
             active_tools, _ = get_conf_infos()
         else:
@@ -47,7 +63,7 @@ def init():
             return active_tools
         else:
             # No scanning tools activated on the system
-            print("\x1b[2J\x1b[H",end="") # clear
+            print("\x1b[2J\x1b[H", end="") # clear
             line1 = colored('No antivirus or scanning modules activated on the system, please ', 'red', attrs=['bold'])
             line2 = colored('activate', 'red', attrs=['bold', 'reverse'])
             line3 = colored(' one !', 'red', attrs=['bold'])
@@ -66,12 +82,26 @@ def finder(elem_dict, option):
     '''
     Search antivirus and scanning modules on the system and return the find one
     '''
-    elem_find_list = []
+    # elem_find_list = []
+    elem_find_dict = {}
     if option == 1:
         for key, value in elem_dict.items():
-            if subprocess.call(['/bin/which', value], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
-                elem_find_list.append(key)
-    return elem_find_list
+            cmd = value['cmd']
+            found_pattern = value['found_pattern']
+            name_pattern = value['name_pattern']
+            type_pattern = value['type_pattern']
+            # print(key)
+            # print(cmd)
+            # print(found_pattern)
+            # exit()
+            if subprocess.call(['/bin/which', cmd], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+                # elem_find_list.append(key)
+                elem_find_dict[key] = {'found_pattern':found_pattern,
+                                       'name_pattern':name_pattern,
+                                       'type_pattern':type_pattern
+                                      }
+    # return elem_find_list
+    return elem_find_dict
 
 def get_version(elem):
     '''
@@ -129,12 +159,19 @@ def get_conf_infos():
         name = config.get(section, 'name')
         actif = config.get(section, 'active')
         version = config.get(section, 'version')
+        found_pattern = config.get(section, 'found_pattern')
+        name_pattern = config.get(section, 'name_pattern')
+        type_pattern = config.get(section, 'type_pattern')
 
         if int(actif[-1:]) == 1:
             if toupdate == 1: # Get tool version and update file
                 version = str(get_version(name))
                 update_confile(name, 'version', version)
-            tools_dict[name] = str(version)
+            tools_dict[name] = {'version':str(version),
+                                'found_pattern':found_pattern,
+                                'name_pattern':name_pattern,
+                                'type_pattern':type_pattern
+                               }
 
         if int(actif[-1:]) == 0:
             disabled_tools.append(name)
@@ -149,13 +186,23 @@ def set_conf_infos(present_tools):
     config = ConfigParser()
     tools_dict = {}
 
-    for tool in present_tools:
+    for tool, value in present_tools.items():
         version = get_version(tool)
+        found_pattern = value['found_pattern']
+        name_pattern = value['name_pattern']
+        type_pattern = value['type_pattern']
         config.add_section(tool)
         config.set(tool, 'name', tool)
         config.set(tool, 'active', '1')
         config.set(tool, 'version', version)
-        tools_dict[tool] = str(version)
+        config.set(tool, 'found_pattern', found_pattern)
+        config.set(tool, 'name_pattern', name_pattern)
+        config.set(tool, 'type_pattern', type_pattern)
+        tools_dict[tool] = {'version':str(version),
+                            'found_pattern':found_pattern,
+                            'name_pattern':name_pattern,
+                            'type_pattern':type_pattern
+                           }
 
     with open(CFG_FILE, mode='w') as settings:
         config.write(settings)

@@ -3,27 +3,16 @@
 #Decontamine Linux - f-secure.py
 #@Alexandre Buissé - 2018/2020
 
+'''
+Scanning module : F-Secure antivirus
+'''
+
 #Standard imports
 import subprocess
 import re
 
 #Project modules imports
 from commontools import start_proc
-
-def get_virus(log_file):
-    '''
-    Get virus dict
-    '''
-    virus_temp_dict = {}
-    virus_name = ''
-    virus_type = ''
-    with open(log_file, mode='r', encoding='utf-8') as log:
-        for line in log:
-            if 'Infected:' in line:
-                virus_name = re.findall('(.*): Infected', str(line))
-                virus_type = re.findall('Infected: (.*)', str(line))
-                virus_temp_dict[virus_name[0]] = virus_type[0]
-    return virus_temp_dict
 
 def scan(mount_pts, log_file):
     '''

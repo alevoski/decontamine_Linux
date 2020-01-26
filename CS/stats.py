@@ -5,9 +5,7 @@
 
 #Standard imports
 import os
-
-#Project modules imports
-from commontools import extract_number
+import re
 
 def stat(log_dir):
     '''
@@ -36,6 +34,17 @@ def stat(log_dir):
             virus_detected = virus_detected + nb_virus_detect
             virus_removed = virus_removed + nb_virus_del
     return len(nb_scan), virus_detected, virus_removed
+
+def extract_number(line):
+    '''
+    Extract number in string
+    '''
+    try:
+        num = re.search('[0-9]+', line)
+        # print(repr(line), repr(num.group(0)))
+        return int(num.group(0))
+    except Exception:
+        return 0
 
 def global_stat(files):
     '''

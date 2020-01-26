@@ -70,7 +70,7 @@ def readlog(final_log):
     '''
     Prompt the user to read the final log
     '''
-    rep = prompter('Do you want to read the detail of the scan ? (y/n)')
+    rep = prompter('Do you want to read the detail of the scan ? (y/n)', ['y', 'Y', 'n', 'N'])
     if rep == 'y':
         subprocess.call(('xdg-open', str(final_log)))
     elif rep == 'n':
@@ -80,7 +80,7 @@ def getlog(final_log, mount_pts):
     '''
     Prompt the user to get a copy of the final log
     '''
-    rep = prompter('Do you want a copy of the detail of the scan ? (y/n)')
+    rep = prompter('Do you want a copy of the detail of the scan ? (y/n)', ['y', 'Y', 'n', 'N'])
     if rep == 'y':
         copied_file = mount_pts + '/' + os.path.basename(final_log)
         # print(final_log)

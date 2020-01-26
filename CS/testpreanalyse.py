@@ -7,6 +7,8 @@
 import time
 import getpass
 import os
+
+#Third party imports
 import getch
 import dbus
 
@@ -304,20 +306,7 @@ def chose_device(obj_dict, chosen):
 
     return device_dict
 
-def get_filesOLD(media):
-    '''
-    Get files of the device selected, return files_list
-    '''
-    files_list = []
-    for root_dir, _, files in os.walk(media):
-        for filename in files:
-            # print(root_dir)
-            if 'System Volume Information' not in root_dir:
-                # print(os.path.join(root_dir, filename))
-                files_list.append(os.path.join(root_dir, filename))
-    return files_list
-
-def get_files(media, files_list=[]):
+def get_files(media, files_list):
     '''
     Get files of the device selected, return files_list
     '''
