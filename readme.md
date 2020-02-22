@@ -5,7 +5,7 @@
 
 Decontamine_Linux is an USB devices cleaning station for Linux.  
 Started since September 2018.  
-Coding and testing on ***Debian 9*** 64 bits with Python 3.  
+Coding and testing on ***Debian 9*** 64 bits with Python 3.5.3  
 Project ongoing.  
 
 ## Getting Started
@@ -80,7 +80,7 @@ Alexandre Buissé
 
 ## License
 Decontamine_Linux. USB devices cleaning station.  
-Copyright (C) 2018 Alexandre Buissé alevoski@pm.me
+Copyright (C) 2018/2020 Alexandre Buissé alevoski@pm.me
 
 This program is free software: you can redistribute it and/or modify  
 it under the terms of the GNU Affero General Public License as published  

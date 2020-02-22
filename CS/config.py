@@ -282,7 +282,7 @@ def activation_question(tools_list, etat, actif, affichage, elem):
     if len(tools_list) > 0:
         print(colored(affichage, 'blue', 'on_white'))
         for tool in tools_list:
-            print(actif)
+            # print(actif)
             print("Do you want to {} ".format(actif) + colored(str(tool), 'grey', 'on_yellow') + " ? (y = yes, n = no)")
             while True:
                 rep3 = str(getch.getch())

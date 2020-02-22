@@ -19,7 +19,7 @@ def scan(mount_pts, log_file):
     Return the proc_id
     '''
     cmdline = ['/usr/bin/clamdscan', '-v', '-m', '--fdpass', '-l', log_file, mount_pts]
-    proc_id = start_proc(cmdline, 2)
+    proc_id = start_proc('ClamAV', cmdline, 2)
     return proc_id
 
 def version():

@@ -1,4 +1,15 @@
 CHANGELOG
+22/02/2020
+    Manage case when activated tool cannot be found
+        Add an exception in commontools.start_proc()
+        Modify analyze module to only take set proc_ids and existing and not empty logs
+    Will no fully unmount and eject/power-off all type of devices
+        Mod list_devices() and depack_device() from testpreanalyse module to get device 'dev/sdx'
+        Mod main.dismount() to dismount device and not just the mount point
+    Add an exception in testPreAnalyse.get_files() in case device is not ready
+    Add tabulate to requirements file
+    Update readme.md
+
 26/01/2020
     Modules static analysis (# pylint3 --disable=line-too-long) + code cleaning and minor corrections
         main.py                 9.64/10

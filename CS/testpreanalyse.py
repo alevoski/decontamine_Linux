@@ -155,7 +155,8 @@ def list_devices(obj_id, drive_type, drive_bus, ejectable):
                                 test += 1
                             if len(label) == 0:
                                 label = iduid
-                            devices[str(device)] = {'label':str(label),
+                            devices[str(device)] = {'device':str(device),
+                                                    'label':str(label),
                                                     'read_only':int(read_only),
                                                     'mount_pts':str(mount_pts)}
             # print(devices)
@@ -171,6 +172,10 @@ def list_devices(obj_id, drive_type, drive_bus, ejectable):
                 test_hdd += 5
             # print(test_hdd)
 
+    if mount_pts == '?': # it will be '?' if the usb device is plugged but unmounted
+        devices = {}
+    # print('devices')
+    # print(devices)
     return devices
 
 def mount_pts_dbus(device):
@@ -283,11 +288,13 @@ def chose_device(obj_dict, chosen):
             # print(len(values))
             i = 0
             for _, device_values in values.items():
+                # print('device : ' + device)
                 # print(device_values)
                 all_devices_dict[i] = device_values
                 i += 1
 
     device_dict = {}
+    part_list = []
     device_dict = all_devices_dict # by default => one device
     if len(all_devices_dict) > 1: # more than one device on the drive
         devices_list = []
@@ -296,6 +303,7 @@ def chose_device(obj_dict, chosen):
         for key, values in all_devices_dict.items():
             print("{} - {}".format(i, values['label']))
             devices_list.append(i)
+            part_list.append(values['device'])
             i += 1
 
         user_choice = prompt_choice(devices_list, 'device')
@@ -304,21 +312,26 @@ def chose_device(obj_dict, chosen):
         device_dict[0] = all_devices_dict[user_choice]
     # print(device_dict)
 
-    return device_dict
+    return device_dict, part_list
 
 def get_files(media, files_list):
     '''
     Get files of the device selected, return files_list
     '''
-    for elems in os.scandir(media):
-        if 'System Volume Information' not in media:
-            try:
-                if elems.is_dir(follow_symlinks=False):
-                    get_files(elems.path, files_list)
-                else:
-                    files_list.append(os.path.join(elems.path, elems.name))
-            except PermissionError:
-                pass
+    try:
+        for elems in os.scandir(media):
+            if 'System Volume Information' not in media:
+                try:
+                    if elems.is_dir(follow_symlinks=False):
+                        get_files(elems.path, files_list)
+                    else:
+                        files_list.append(os.path.join(elems.path, elems.name))
+                except PermissionError:
+                    pass
+    except PermissionError:
+        print(media + ' is not ready, please wait.')
+        time.sleep(2)
+        get_files(media, files_list)
     return files_list
 
 def depack_device(device_dict):
@@ -326,10 +339,11 @@ def depack_device(device_dict):
     Return label, mount_pts and read_only state of a device dictionnary passed in parameter
     '''
     for _, values in device_dict.items():
+        device = [values['device']]
         label = values['label']
         mount_pts = values['mount_pts']
         read_only = values['read_only']
-    return label, mount_pts, read_only
+    return device, label, mount_pts, read_only
 
 def init():
     '''
@@ -345,15 +359,15 @@ def init():
     elif len(obj_dict.keys()) == 1:
         chosen = list(obj_dict.keys())
     else:
-        return 0, 0
+        return 0, 0, 0
 
     # Get devices of the drive selected
     try:
-        device_dict = chose_device(obj_dict, chosen)
+        device_dict, part_list = chose_device(obj_dict, chosen)
     except TypeError:
-        device_dict = chose_device(obj_dict, chosen[0])
+        device_dict, part_list = chose_device(obj_dict, chosen[0])
 
-    return chosen, device_dict
+    return chosen, device_dict, part_list
 
 if __name__ == '__main__':
     print(init())

@@ -50,8 +50,9 @@ def init(tools_dict, mount_pts, log_file_path):
             resul_list.append(executor.submit(tocall.scan, mount_pts, log_file))
     for elem in resul_list:
         proc_id = elem.result()
-        proc_status = status_proc(proc_id)
-        proc_dict[proc_id] = proc_status
+        if proc_id: # if tool has been found
+            proc_status = status_proc(proc_id)
+            proc_dict[proc_id] = proc_status
 
     # Waiting for processes to finish or for user input
     resul_list = []
@@ -77,12 +78,14 @@ def init(tools_dict, mount_pts, log_file_path):
         found_pattern = values['found_pattern']
         name_pattern = values['name_pattern']
         type_pattern = values['type_pattern']
-        write_first_line(log_file, '\n*****Scan with ' + tool + ' - begin*****\n')
-        writelog(log_file, '\n*****Scan with ' + tool + ' - finish*****\n', 'utf-8')
-        virus_dict = get_virus(log_file, found_pattern, name_pattern, type_pattern)
-        log_av_list.append(log_file)
-        if isinstance(virus_dict, dict) and len(virus_dict) > 0:
-            detection_dict = virus_found_tools(detection_dict, virus_dict, tool)
+        if os.path.isfile(log_file): # If file exist
+            if os.stat(log_file).st_size > 0: # if file is not empty
+                write_first_line(log_file, '\n*****Scan with ' + tool + ' - begin*****\n')
+                writelog(log_file, '\n*****Scan with ' + tool + ' - finish*****\n', 'utf-8')
+                virus_dict = get_virus(log_file, found_pattern, name_pattern, type_pattern)
+                log_av_list.append(log_file)
+                if isinstance(virus_dict, dict) and len(virus_dict) > 0:
+                    detection_dict = virus_found_tools(detection_dict, virus_dict, tool)
 
     return detection_dict, log_av_list
 

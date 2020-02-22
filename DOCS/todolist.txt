@@ -31,5 +31,3 @@ Top priorities
     Analyze with Bitdefender   
     Analyze with Avast       
     Analyze with ope (office, pdf and exe) module
-    Force umount (CD/DVD)
-    Full umount

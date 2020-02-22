@@ -10,6 +10,7 @@ import subprocess
 import getch
 
 #Project modules imports
+import config
 import kbhitClass
 
 def import_from(module, name):
@@ -47,16 +48,22 @@ def prompter(question, choice_list):
             break
     return rep
 
-def start_proc(procname, mode, fwrite=subprocess.DEVNULL):
+def start_proc(tool, procname, mode, fwrite=subprocess.DEVNULL):
     '''
     Start a process and return its process id
     '''
-    if mode == 1: # non blocking mode
-        proc = subprocess.Popen(procname, shell=False)
-    elif mode == 2: # non blocking mode + redirect stdout
-        proc = subprocess.Popen(procname, stdout=fwrite, shell=False)
-    else:
-        proc = subprocess.check_output([procname]) # Blocking call
+    try:
+        if mode == 1: # non blocking mode
+            proc = subprocess.Popen(procname, shell=False)
+        elif mode == 2: # non blocking mode + redirect stdout
+            proc = subprocess.Popen(procname, stdout=fwrite, shell=False)
+        else:
+            proc = subprocess.check_output([procname]) # Blocking call
+    except FileNotFoundError:
+        print('Cannot found ' + tool + ' !')
+        config.update_confile(tool, 'active', '0')
+        print('It is now disabled')
+        return False
     return proc
 
 def status_proc(proc):

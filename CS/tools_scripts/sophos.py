@@ -21,7 +21,7 @@ def scan(mount_pts, log_file):
     '''
     # cmdline = ['/usr/local/bin/savscan', '-f', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', mount_pts, '-p='+ log_file]
     cmdline = ['/usr/local/bin/savscan', '-q', '-all', '-rec', '-sc', '--stay-on-filesystem', '--stay-on-machine', '--backtrack-protection', '--preserve-backtrack', '--no-reset-atime', mount_pts, '-p='+ log_file]
-    proc_id = start_proc(cmdline, 2)
+    proc_id = start_proc('Sophos', cmdline, 2)
     return proc_id
 
 def version():

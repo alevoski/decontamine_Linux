@@ -25,16 +25,29 @@ import logmanagement
 
 LOG_DIRECTORY = '/home/decontamine/'
 
-def dismount(mount_pts):
+def dismount(device_list, read_only):
     '''
     Prompt the user to dismount and take back his device
     '''
     rep = commontools.prompter('Do you want to eject and get back your device ? (y/n)', ['y', 'Y', 'n', 'N'])
     if rep in ['y', 'Y']:
-        if subprocess.call(['/bin/umount', str(mount_pts)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
-            print('Success to umount your device !')
+        ok_list = []
+        device = ''
+        for device in device_list: # list of devices in case of drive with multiple devices
+            # if subprocess.call(['/bin/umount', str(device)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+            if subprocess.call(['/usr/bin/udisksctl', 'unmount', '-bf', str(device)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+                # print('Success to umount your device !')
+                ok_list.append(1)
+        if len(ok_list) == len(device_list):
+            print('Success to unmount your device !')
+            if read_only == 1: # CDROM
+                if subprocess.call(['/usr/bin/eject', str(device)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+                    print('You can get back your CD/DVD or read only device !')
+            elif read_only == 0: # USB device
+                if subprocess.call(['/usr/bin/udisksctl', 'power-off', '-b', str(device)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+                    print('You can get back your device !')
         else:
-            print('Cannot umount your device !')
+            print('Cannot unmount your device !')
         print('Press any key to exit.')
         if getch.getch():
             pass
@@ -113,11 +126,11 @@ def init():
             if rep in ['e', 'E']:   # Exit
                 exit(1)
 
-            chosen, device_dict = testpreanalyse.init() # Will not take any user input during the test
-        # print(chosen, device_dict)
+            chosen, device_dict, part_list = testpreanalyse.init() # Will not take any user input during the test
+        # print(chosen, device_dict, part_list)
 
         # Get device attributs
-        label, mount_pts, read_only = testpreanalyse.depack_device(device_dict)
+        device_list, label, mount_pts, read_only = testpreanalyse.depack_device(device_dict)
 
         if mount_pts != '':
             log_file_path = LOG_DIRECTORY + 'LOGS/{}'.format(datetime.now().strftime('%Y/%m/%d'))
@@ -199,7 +212,9 @@ def init():
                     logmanagement.getlog(final_log, mount_pts)
 
                 # 7 - Prompt the user to dismount and take back his device
-                dismount(mount_pts)
+                if part_list:
+                    device_list = part_list
+                dismount(device_list, read_only)
 
                 # 8 - Reload the process
                 init()

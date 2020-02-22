@@ -21,7 +21,7 @@ def scan(mount_pts, log_file):
     '''
     cmdline = ['/usr/bin/fsav', '--virus-action1=report', '--allfiles', '--archive', '--maxnested=15', '--scantimeout=180', mount_pts]
     with open(log_file, mode='w', encoding='utf-8') as flog:
-        proc_id = start_proc(cmdline, 2, flog)
+        proc_id = start_proc('F-Secure', cmdline, 2, flog)
     return proc_id
 
 def version():
