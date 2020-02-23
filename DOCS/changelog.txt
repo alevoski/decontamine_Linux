@@ -1,9 +1,11 @@
 CHANGELOG
+23/02/2020
+    New demos GIF
 22/02/2020
     Manage case when activated tool cannot be found
         Add an exception in commontools.start_proc()
         Modify analyze module to only take set proc_ids and existing and not empty logs
-    Will no fully unmount and eject/power-off all type of devices
+    Will now fully unmount and eject/power-off all type of devices
         Mod list_devices() and depack_device() from testpreanalyse module to get device 'dev/sdx'
         Mod main.dismount() to dismount device and not just the mount point
     Add an exception in testPreAnalyse.get_files() in case device is not ready
